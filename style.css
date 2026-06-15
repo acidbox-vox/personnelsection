@@ -12,11 +12,12 @@ body {
     background-color: var(--bg-color);
     color: var(--text-main);
     margin: 0;
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow-y: hidden; /* ล็อกให้อยู่ในหน้าจอเดียว ไม่ต้องเลื่อนขึ้นลง */
+    overflow-y: auto; /* แก้ไข: เปิดให้มี Scrollbar เลื่อนดูด้านล่างได้เมื่อหน้าจอล้น */
     box-sizing: border-box;
+    padding-bottom: 60px; /* เพิ่มพื้นที่ด้านล่างสุดไม่ให้การ์ดบังปุ่ม */
 }
 
 header {
@@ -31,17 +32,15 @@ h1 {
     font-size: 22px;
 }
 
-/* Container ปรับความสูงและสร้างแกนลำต้นคริสต์มาส */
+/* Container ปรับการเว้นระยะแนวตั้งให้อิสระขึ้นตามการเลื่อนจอ */
 #chart-pyramid {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    height: 80vh; 
+    gap: 45px; /* กำหนดระยะห่างระหว่างชั้นความสูงให้นิ่งและพอดีสายตา */
     position: relative;
     max-width: 1300px;
-    margin: 0 auto;
+    margin: 30px auto;
     width: 100%;
-    padding-bottom: 20px;
 }
 
 /* เส้นแกนกลางแนวตั้งดิ่งจากบนลงล่างทิ้งตรงเป๊ะ */
@@ -89,6 +88,7 @@ h1 {
     justify-content: center;
     gap: 12px;
     width: 100%;
+    flex-wrap: wrap; /* ป้องกันการ์ดเบียดหลุดขอบซ้ายขวาในจอเล็ก */
 }
 
 /* การ์ดบุคคลมินิมอลเว้นระยะพอดีหน้าจอ */
