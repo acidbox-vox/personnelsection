@@ -7,10 +7,10 @@ let rawChartData = null;
 function transformTreeToLayers(treeData) {
     const layers = {};
     
-    // ชั้น 1: หัวหน้า (ยอดบนสุด)
+    // ชั้น 1: หัวหน้า (ยอดบนสุด - ดึงจากไฟล์ data.json โดยตรง)
     layers[1] = [ { id: treeData.id, name: treeData.name, title: treeData.title, phone: treeData.phone || '-', photo: treeData.photo || '' } ];
     
-    // ชั้น 2: รองหัวหน้า (ปรับเหลือ 1 คนถ้วนตามกระดานจริง)
+    // ชั้น 2: รองหัวหน้า (1 คนถ้วน)
     layers[2] = [ { id: "r2_deputy_single", name: "รองหัวหน้า", title: "รองหัวหน้า", phone: "-", photo: "" } ];
 
     // ชั้น 3: นายทหาร (มี 6 คน)
@@ -59,10 +59,12 @@ function renderPyramidChart() {
     
     if(savedData) {
         rawChartData = JSON.parse(savedData);
-        // ตรวจสอบและบังคับลบตัวแปรซ้ำซ้อนใน LocalStorage (หากเคยมีระบบจำค่าเก่า)
+        // บังคับชั้นที่ 2 ให้เป็นรองหัวหน้าคนเดียวเพื่อความสม่ำเสมอ
         for (let layer of rawChartData) {
             if(layer.layer === 2) {
-                layer.people = [ { id: "r2_deputy_single", name: "รองหัวหน้า", title: "รองหัวหน้า", phone: "-", photo: "" } ];
+                if(layer.people.length !== 1) {
+                    layer.people = [ { id: "r2_deputy_single", name: "รองหัวหน้า", title: "รองหัวหน้า", phone: "-", photo: "" } ];
+                }
             }
         }
         buildHtmlDOM(rawChartData);
@@ -73,6 +75,9 @@ function renderPyramidChart() {
             rawChartData = transformTreeToLayers(data);
             localStorage.setItem("pyramid_chart_data", JSON.stringify(rawChartData));
             buildHtmlDOM(rawChartData);
+        })
+        .catch(err => {
+            console.error("Error loading data.json:", err);
         });
     }
 }
@@ -80,6 +85,7 @@ function renderPyramidChart() {
 function buildHtmlDOM(layers) {
     const container = document.getElementById("chart-pyramid");
     container.innerHTML = '';
+    const defaultImg = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
 
     layers.forEach(layerData => {
         const row = document.createElement("div");
@@ -93,10 +99,12 @@ function buildHtmlDOM(layers) {
             const card = document.createElement("div");
             card.className = `node-card ${person.name === 'ว่าง' ? 'vacant' : ''}`;
             
-            const imgUrl = person.photo ? person.photo : 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+            // ตรวจสอบความถูกต้องของลิงก์รูปภาพ
+            const imgUrl = (person.photo && person.photo.trim() !== "") ? person.photo : defaultImg;
             
+            // ใช้ onerror ในแท็ก img เพื่อป้องกันกรณีที่พาธไฟล์ในดาต้าเบสเสีย/ไม่เจอบนเซิร์ฟเวอร์
             card.innerHTML = `
-                <img src="${imgUrl}" alt="profile">
+                <img src="${imgUrl}" onerror="this.onerror=null; this.src='${defaultImg}';" alt="profile">
                 <div class="name">${person.name}</div>
                 <div class="title">${person.title}</div>
             `;
@@ -107,7 +115,10 @@ function buildHtmlDOM(layers) {
                 document.getElementById("personName").innerText = person.name;
                 document.getElementById("personPosition").innerText = person.title;
                 document.getElementById("personPhone").innerText = person.phone || '-';
-                document.getElementById("personPhoto").src = imgUrl;
+                
+                const modalImg = document.getElementById("personPhoto");
+                modalImg.src = imgUrl;
+                modalImg.onerror = function() { this.src = defaultImg; };
                 
                 if(isAdmin) {
                     document.getElementById("adminEditForm").style.display = "block";
@@ -162,7 +173,7 @@ function activateAdmin() {
 
 document.getElementById("logoutBtn").onclick = () => {
     localStorage.setItem("admin_logged_in", "false");
-    localStorage.removeItem("pyramid_chart_data"); // ล้างแคชเพื่ออัปเดตโครงสร้างใหม่
+    localStorage.removeItem("pyramid_chart_data"); // ล้างแคชเพื่ออัปเดตโครงสร้างใหม่ทั้งหมด
     location.reload();
 };
 
