@@ -13,11 +13,11 @@
     
     <style>
         :root {
-            --bg-color: #f4f5f6;      /* สีพื้นหลังเทาอ่อนมากๆ */
+            --bg-color: #f4f5f6;      /* สีพื้นหลังเทาอ่อนมินิมอล */
             --card-bg: #ffffff;       /* สีพื้นหลังการ์ดขาวสะอาด */
             --text-main: #2b2d42;     /* สีฟอนต์เทาเข้มชาร์โคล */
             --text-sub: #8d99ae;      /* สีฟอนต์เทาซอฟต์สำหรับตำแหน่ง */
-            --line-color: #d8dbdd;    /* สีเส้นเชื่อมโยงเทามินิมอล */
+            --line-color: #d8dbdd;    /* สีเส้นเชื่อมโยงเทาบาง */
             --modal-blur: rgba(244, 245, 246, 0.85);
         }
 
@@ -46,7 +46,7 @@
             color: var(--text-main);
         }
 
-        /* Container ล็อกผังนิ่งและบังคับกึ่งกลางเสมอ */
+        /* Container บังคับผังล็อกนิ่งตรงกลางหน้าจอ */
         #chart-container {
             flex-grow: 1;
             padding: 20px 40px;
@@ -56,18 +56,17 @@
             min-width: max-content;
         }
 
-        /* ปรับสไตล์ตัวผัง OrgChart ให้เป็นแนวเรียบแบนมินิมอล */
         .orgchart {
             background: transparent !important;
         }
 
-        /* จัดการสไตล์เส้นเชื่อมโยงให้บางและเป็นสีเทาอ่อน */
+        /* ตกแต่งเส้นเชื่อมโยงให้บางและมินิมอล */
         .orgchart .lines .downLine { background-color: var(--line-color) !important; width: 1px !important; }
         .orgchart .lines .topLine { border-top: 1px solid var(--line-color) !important; }
         .orgchart .lines .leftLine { border-right: 1px solid var(--line-color) !important; }
         .orgchart .lines .rightLine { border-left: 1px solid var(--line-color) !important; }
 
-        /* การ์ดบุคคลในแต่ละแถว */
+        /* การ์ดบุคคลปกติ */
         .orgchart .node {
             width: 165px !important;
             border: 1px solid #e6e8ea !important;
@@ -78,14 +77,23 @@
             transition: all 0.25s ease-in-out !important;
         }
 
-        /* เอฟเฟกต์ยกตัวเล็กน้อยเมื่อ Hover โดยที่ผังไม่เลื่อนขยับ */
         .orgchart .node:hover {
             transform: translateY(-3px) !important;
             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.04) !important;
             border-color: #d1d5db !important;
         }
 
-        /* ซ่อนแถบสีหัวโหนดเดิมเพื่อให้ดูคลีนที่สุด */
+        /* เทคนิคซ่อนโหนดเชื่อมต่อ (ทำให้ผังทิ้งดิ่งตรงกลางสมมาตรปิรามิด) */
+        .orgchart .node.invisible-connector {
+            visibility: hidden !important;
+            opacity: 0 !important;
+            height: 0px !important;
+            width: 1px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            pointer-events: none !important;
+        }
+
         .orgchart .node .title {
             background-color: transparent !important;
             color: var(--text-sub) !important;
@@ -121,7 +129,6 @@
             border-radius: 6px;
             font-size: 12px;
             font-weight: 500;
-            letter-spacing: 0.5px;
         }
 
         #logoutBtn {
@@ -134,11 +141,9 @@
             font-family: inherit;
             font-size: 12px;
             font-weight: 500;
-            transition: background 0.2s;
         }
         #logoutBtn:hover { background: #f4f5f6; }
 
-        /* ปุ่มเฟืองทางเข้าแอดมิน */
         #adminBtn {
             position: fixed;
             bottom: 30px;
@@ -152,12 +157,10 @@
             cursor: pointer;
             font-size: 18px;
             box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
             z-index: 999;
         }
-        #adminBtn:hover { transform: rotate(45deg); background: #1d1e2c; }
 
-        /* หน้าต่าง Modal แบบกระจกฝ้าซูมการ์ดตรงกลาง */
+        /* Modal ซูมการ์ดบุคคลกึ่งกลางหน้าจอ */
         .modal {
             display: none;
             position: fixed;
@@ -170,7 +173,6 @@
             backdrop-filter: blur(10px);
         }
 
-        /* แอนิเมชันซูมเข้าเฉพาะส่วนเนื้อหาการ์ด Pop-up */
         @keyframes minimalistZoom {
             from { opacity: 0; transform: translate(-50%, -47%) scale(0.92); }
             to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
@@ -213,34 +215,12 @@
             border: 1px solid #f0f2f4;
         }
 
-        .close { 
-            position: absolute; 
-            right: 22px; 
-            top: 18px; 
-            cursor: pointer; 
-            font-size: 22px; 
-            color: #adb5bd; 
-            transition: color 0.2s;
-        }
+        .close { position: absolute; right: 22px; top: 18px; cursor: pointer; font-size: 22px; color: #adb5bd; }
         .close:hover { color: var(--text-main); }
 
-        /* ส่วนฟอร์มสำหรับแอดมินแก้ไขข้อมูล */
-        .edit-form { 
-            display: none; 
-            margin-top: 25px; 
-            text-align: left; 
-            border-top: 1px solid #f0f2f4; 
-            padding-top: 20px; 
-        }
-        .edit-form label { 
-            font-size: 11px; 
-            font-weight: 500;
-            text-transform: uppercase; 
-            color: #94a3b8; 
-            display: block; 
-            margin-bottom: 5px; 
-            letter-spacing: 0.5px;
-        }
+        /* ฟอร์มแก้ไข */
+        .edit-form { display: none; margin-top: 25px; text-align: left; border-top: 1px solid #f0f2f4; padding-top: 20px; }
+        .edit-form label { font-size: 11px; font-weight: 500; text-transform: uppercase; color: #94a3b8; display: block; margin-bottom: 5px; }
         .edit-form input {
             width: 100%;
             padding: 9px 12px;
@@ -252,10 +232,6 @@
             box-sizing: border-box;
             color: var(--text-main);
             background-color: #fbfbfc;
-        }
-        .edit-form input:focus {
-            outline: none;
-            border-color: #cbd5e1;
         }
 
         .save-btn {
@@ -269,7 +245,6 @@
             font-family: inherit;
             font-weight: 500;
             font-size: 14px;
-            transition: background 0.2s;
         }
         .save-btn:hover { background: #1d1e2c; }
     </style>
@@ -304,7 +279,7 @@
                 <input type="text" id="inputPosition">
                 <label>เบอร์โทรศัพท์</label>
                 <input type="text" id="inputPhone">
-                <label>ที่อยู่ลิงก์รูปภาพ (URL)</label>
+                <label>ลิงก์รูปภาพ (URL)</label>
                 <input type="text" id="inputPhoto">
                 <button class="save-btn" id="saveChangeBtn">SAVE CHANGES</button>
             </div>
@@ -320,71 +295,79 @@
         let selectedNodeId = null;
         let currentChartData = null;
 
-        // 1. โครงสร้าง JSON แถวปิรามิดกึ่งกลางสมบูรณ์แบบเรียงลำดับชั้นทีละระดับ (ไร้การผูกเส้นเยื้องสายตรง)
+        // โครงสร้างปิรามิดสมมาตรหน้ากระดาน 100% โดยใช้ Invisible Connector บังคับทิศทางตรงกึ่งกลาง
         const initialData = {
-            "id": "row1_1", "name": "หัวหน้า", "title": "หัวหน้าแผนก", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+            "id": "r1_head", "name": "หัวหน้า", "title": "หัวหน้า", "phone": "-", "photo": "",
             "children": [
                 {
-                    "id": "row2_1", "name": "รองหัวหน้า", "title": "รองหัวหน้าแผนก", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+                    "id": "r2_deputy", "name": "รองหัวหน้า", "title": "รองหัวหน้า", "phone": "-", "photo": "",
                     "children": [
-                        // แถวชั้นที่ 3: นายทหารกำลังพล 4 นาย + นายทหารสัสดี 2 นาย (รวม 6 คนในระนาบเดียวกันกึ่งกลางเป๊ะ)
-                        {"id": "row3_1", "name": "นายทหารกำลังพล 1", "title": "นายทหารกำลังพล", "phone": "-", "photo": ""},
-                        {"id": "row3_2", "name": "นายทหารกำลังพล 2", "title": "นายทหารกำลังพล", "phone": "-", "photo": ""},
-                        {"id": "row3_3", "name": "นายทหารกำลังพล 3", "title": "นายทหารกำลังพล", "phone": "-", "photo": ""},
-                        {"id": "row3_4", "name": "นายทหารกำลังพล 4", "title": "นายทหารกำลังพล", "phone": "-", "photo": ""},
-                        {"id": "row3_5", "name": "นายทหารสัสดี 1", "title": "นายทหารสัสดี", "phone": "-", "photo": ""},
-                        {"id": "row3_6", "name": "นายทหารสัสดี 2", "title": "นายทหารสัสดี", "phone": "-", "photo": "",
+                        // แถวที่ 3: นายทหารกำลังพล 4 นาย และ นายทหารสัสดี 2 นาย (รวม 6 คน เรียงหน้ากระดานกึ่งกลาง)
+                        {"id": "r3_kp1", "name": "นายทหารกำลังพล 1", "title": "นายทหารกำลังพล", "phone": "-"},
+                        {"id": "r3_kp2", "name": "นายทหารกำลังพล 2", "title": "นายทหารกำลังพล", "phone": "-"},
+                        {
+                            // ตัวเชื่อมล่องหนตัวที่ 1 (ดิ่งลงมาจากจุดกึ่งกลางแถวที่ 3)
+                            "id": "conn_1", "className": "invisible-connector", "name": "conn", "title": "conn",
                             "children": [
-                                // แถวชั้นที่ 4: จนท.กำลังพล 5 นาย (รวม 5 คน แตกกิ่งสมมาตรกึ่งกลาง)
-                                {"id": "row4_1", "name": "จนท.กำลังพล 1", "title": "จนท.กำลังพล", "phone": "-"},
-                                {"id": "row4_2", "name": "จนท.กำลังพล 2", "title": "จนท.กำลังพล", "phone": "-"},
-                                {"id": "row4_3", "name": "จนท.กำลังพล 3", "title": "จนท.กำลังพล", "phone": "-"},
-                                {"id": "row4_4", "name": "จนท.กำลังพล 4", "title": "จนท.กำลังพล", "phone": "-"},
-                                {"id": "row4_5", "name": "จนท.กำลังพล 5", "title": "จนท.กำลังพล", "phone": "-",
+                                // แถวที่ 4: จนท.กำลังพล 5 นาย (เรียงหน้ากระดานกึ่งกลางสมดุล)
+                                {"id": "r4_kp1", "name": "จนท.กำลังพล 1", "title": "จนท.กำลังพล", "phone": "-"},
+                                {"id": "r4_kp2", "name": "จนท.กำลังพล 2", "title": "จนท.กำลังพล", "phone": "-"},
+                                {
+                                    // ตัวเชื่อมล่องหนตัวที่ 2 (ดิ่งลงมาจากจุดกึ่งกลางแถวที่ 4)
+                                    "id": "conn_2", "className": "invisible-connector", "name": "conn", "title": "conn",
                                     "children": [
-                                        // แถวชั้นที่ 5: จนท.กำลังพลน้อย 5 นาย + จนท.สัสดี 1 นาย (รวม 6 คนในระนาบเดียวกันกึ่งกลาง)
-                                        {"id": "row5_1", "name": "จนท.กำลังพลน้อย 1", "title": "จนท.กำลังพลน้อย", "phone": "-"},
-                                        {"id": "row5_2", "name": "จนท.กำลังพลน้อย 2", "title": "จนท.กำลังพลน้อย", "phone": "-"},
-                                        {"id": "row5_3", "name": "จนท.กำลังพลน้อย 3", "title": "จนท.กำลังพลน้อย", "phone": "-"},
-                                        {"id": "row5_4", "name": "จนท.กำลังพลน้อย 4", "title": "จนท.กำลังพลน้อย", "phone": "-"},
-                                        {"id": "row5_5", "name": "จนท.กำลังพลน้อย 5", "title": "จนท.กำลังพลน้อย", "phone": "-"},
-                                        {"id": "row5_6", "name": "จนท.สัสดี 1", "title": "จนท.สัสดี", "phone": "-",
+                                        // แถวที่ 5: จนท.กำลังพลน้อย 5 นาย และ จนท.สัสดี 1 นาย (รวม 6 คน เรียงหน้ากระดานกึ่งกลาง)
+                                        {"id": "r5_kpn1", "name": "จนท.กำลังพลน้อย 1", "title": "จนท.กำลังพลน้อย", "phone": "-"},
+                                        {"id": "r5_kpn2", "name": "จนท.กำลังพลน้อย 2", "title": "จนท.กำลังพลน้อย", "phone": "-"},
+                                        {"id": "r5_kpn3", "name": "จนท.กำลังพลน้อย 3", "title": "จนท.กำลังพลน้อย", "phone": "-"},
+                                        {
+                                            // ตัวเชื่อมล่องหนตัวที่ 3 (ดิ่งลงมาจากจุดกึ่งกลางแถวที่ 5)
+                                            "id": "conn_3", "className": "invisible-connector", "name": "conn", "title": "conn",
                                             "children": [
-                                                // แถวชั้นที่ 6: พนักงานราชการ 5 นาย (ล่างสุด แตกกิ่งกึ่งกลางสมบูรณ์)
-                                                {"id": "row6_1", "name": "พนักงานราชการ 1", "title": "พนักงานราชการ", "phone": "-"},
-                                                {"id": "row6_2", "name": "พนักงานราชการ 2", "title": "พนักงานราชการ", "phone": "-"},
-                                                {"id": "row6_3", "name": "พนักงานราชการ 3", "title": "พนักงานราชการ", "phone": "-"},
-                                                {"id": "row6_4", "name": "พนักงานราชการ 4", "title": "พนักงานราชการ", "phone": "-"},
-                                                {"id": "row6_5", "name": "พนักงานราชการ 5", "title": "พนักงานราชการ", "phone": "-"}
+                                                // แถวที่ 6: พนักงานราชการ 5 นาย (ล่างสุด เรียงหน้ากระดานกึ่งกลางสมบูรณ์)
+                                                {"id": "r6_pw1", "name": "พนักงานราชการ 1", "title": "พนักงานราชการ", "phone": "-"},
+                                                {"id": "r6_pw2", "name": "พนักงานราชการ 2", "title": "พนักงานราชการ", "phone": "-"},
+                                                {"id": "r6_pw3", "name": "พนักงานราชการ 3", "title": "พนักงานราชการ", "phone": "-"},
+                                                {"id": "r6_pw4", "name": "พนักงานราชการ 4", "title": "พนักงานราชการ", "phone": "-"},
+                                                {"id": "r6_pw5", "name": "พนักงานราชการ 5", "title": "พนักงานราชการ", "phone": "-"}
                                             ]
-                                        }
+                                        },
+                                        {"id": "r5_kpn4", "name": "จนท.กำลังพลน้อย 4", "title": "จนท.กำลังพลน้อย", "phone": "-"},
+                                        {"id": "r5_kpn5", "name": "จนท.กำลังพลน้อย 5", "title": "จนท.กำลังพลน้อย", "phone": "-"},
+                                        {"id": "r5_ss1", "name": "จนท.สัสดี 1", "title": "จนท.สัสดี", "phone": "-"}
                                     ]
-                                }
+                                },
+                                {"id": "r4_kp3", "name": "จนท.กำลังพล 3", "title": "จนท.กำลังพล", "phone": "-"},
+                                {"id": "r4_kp4", "name": "จนท.กำลังพล 4", "title": "จนท.กำลังพล", "phone": "-"},
+                                {"id": "r4_kp5", "name": "จนท.กำลังพล 5", "title": "จนท.กำลังพล", "phone": "-"}
                             ]
-                        }
+                        },
+                        {"id": "r3_kp3", "name": "นายทหารกำลังพล 3", "title": "นายทหารกำลังพล", "phone": "-"},
+                        {"id": "r3_kp4", "name": "นายทหารกำลังพล 4", "title": "นายทหารกำลังพล", "phone": "-"},
+                        {"id": "r3_ss1", "name": "นายทหารสัสดี 1", "title": "นายทหารสัสดี", "phone": "-"},
+                        {"id": "r3_ss2", "name": "นายทหารสัสดี 2", "title": "นายทหารสัสดี", "phone": "-"}
                     ]
                 }
             ]
         };
 
-        // 2. ฟังก์ชันเริ่มโหลดผังองค์กรล็อกมุมมองนิ่งสนิท
         function renderChart() {
-            const savedData = localStorage.getItem("minimal_pyramid_chart");
+            const savedData = localStorage.getItem("fixed_pyramid_chart");
             currentChartData = savedData ? JSON.parse(savedData) : initialData;
 
             $('#chart-container').html('');
             $('#chart-container').orgchart({
                 'data': currentChartData,
                 'nodeContent': 'title',
-                'pan': false,       /* ปิดการลากขยับตัวผังใหญ่ */
-                'zoom': false       /* ปิดการสกรอลล์ซูมผังใหญ่ */
+                'pan': false,
+                'zoom': false
             });
 
             if(localStorage.getItem("admin_logged_in") === "true") activateAdmin();
         }
 
-        // 3. ระบบคลิกแสดงรายละเอียดเพื่อสเกลซูมเฉพาะการ์ดป๊อปอัปเด้งขึ้นมา
-        $(document).on('click', '.node', function(e){
+        // ระบบคลิกโหนดปกติ (ไม่ทำงานเมื่อกดโดนตัวเชื่อมล่องหน)
+        $(document).on('click', '.node:not(.invisible-connector)', function(e){
             e.stopPropagation();
             const data = $(this).data('nodeData');
             selectedNodeId = data.id;
@@ -410,7 +393,7 @@
             if(e.target == this) $('#detailModal').fadeOut(200);
         });
 
-        // 4. เข้าสู่ระบบผู้ดูแลระบบ
+        // เปิดโหมดแอดมิน
         $('#adminBtn').click(function() {
             const p = prompt("กรุณากรอกรหัสผ่านแอดมินเพื่อเปิดระบบแก้ไข:");
             if(p === ADMIN_PASSWORD) {
@@ -433,7 +416,7 @@
             location.reload();
         });
 
-        // 5. ลูปอัปเดตค่าลงใน JSON
+        // อัปเดตข้อมูลย้อนกลับไปที่หน่วยความจำ JSON
         function findAndUpdate(data, id, n, t, ph, pic) {
             if(data.id === id) {
                 data.name = n; data.title = t; data.phone = ph; data.photo = pic;
@@ -447,10 +430,9 @@
             return false;
         }
 
-        // 6. กดบันทึกข้อมูลถาวร
         $('#saveChangeBtn').click(function() {
             findAndUpdate(currentChartData, selectedNodeId, $('#inputName').val(), $('#inputPosition').val(), $('#inputPhone').val(), $('#inputPhoto').val());
-            localStorage.setItem("minimal_pyramid_chart", JSON.stringify(currentChartData));
+            localStorage.setItem("fixed_pyramid_chart", JSON.stringify(currentChartData));
             alert("บันทึกข้อมูลเรียบร้อยแล้ว");
             location.reload();
         });
