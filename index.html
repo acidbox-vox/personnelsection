@@ -1,3 +1,10 @@
+รับทราบครับ! มีการปรับเปลี่ยนจำนวนบุคลากรในบางตำแหน่งจากรอบก่อนหน้า (รอบนี้ปรับเป็น: เจ้าหน้าที่กำลังพล 5 / เจ้าหน้าที่กำลังพลน้อย 5 / เจ้าหน้าที่สัสดี 1)
+
+ผมได้นำข้อมูลจำนวนล่าสุดนี้ไปจัดโครงสร้างใหม่ให้เป็นทรงปิรามิดที่สมดุล โดยให้**หัวหน้าอยู่ตรงกลางบนสุด และผังใหญ่ล็อกนิ่งไม่มีการขยับ** ส่วน**ระบบซูมจะทำงานเฉพาะการ์ดบุคคล (Modal)** ที่เด้งขยายตัวนุ่มนวลขึ้นมาเมื่อกดคลิกตามที่คุณต้องการเป๊ะ ๆ เลยครับ
+
+คุณสามารถคัดลอกโค้ดทั้งหมดด้านล่างนี้ ไปวางทับในไฟล์ `index.html` เพียงไฟล์เดียวได้เลยครับ:
+
+```html
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -129,7 +136,6 @@
             height: 100%;
             background: rgba(0,0,0,.5);
             backdrop-filter: blur(4px);
-            transition: opacity 0.3s ease;
         }
 
         /* แอนิเมชันสำหรับค่อยๆ ซูมขยายตัวการ์ดข้อมูลบุคคลขึ้นมาเฉพาะส่วน */
@@ -158,7 +164,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(1);
-            animation: zoomInCard 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: zoomInCard 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
         #personPhoto {
@@ -272,79 +278,100 @@
         let selectedNodeId = null; 
         let currentChartData = null; 
 
-        // 1. โครงสร้างข้อมูลปิรามิด 5 ระดับ (หัวหน้า 1 -> รอง 1 -> นายทหาร 6 -> เจ้าหน้าที่ 11 -> พนักงาน 5)
+        // 1. จัดโครงสร้างผังตามลำดับข้อมูลล่าสุดที่ระบุมาเป๊ะ ๆ
         const defaultData = {
-            "id": "node_1", "name": "หัวหน้า 1", "title": "หัวหน้าแผนก", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+            "id": "node_1", "name": "หัวหน้า", "title": "หัวหน้า", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
             "children": [
                 {
-                    "id": "node_2", "name": "รองหัวหน้า 1", "title": "รองหัวหน้าแผนก", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                    "id": "node_2", "name": "รองหัวหน้า", "title": "รองหัวหน้า", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
                     "children": [
-                        // สายงานนายทหารกำลังพล (4 คน)
+                        // สายงานนายทหารกำลังพล (4 นาย)
                         {
                             "id": "node_3", "name": "นายทหารกำลังพล 1", "title": "นายทหารกำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
                             "children": [
                                 {
-                                    "id": "node_7", "name": "เจ้าหน้าที่กำลังพล 1", "title": "เจ้าหน้าที่กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                                    "id": "node_7", "name": "จนท.กำลังพล 1", "title": "จนท.กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
                                     "children": [
-                                        {"id": "node_12", "name": "เจ้าหน้าที่กำลังพลน้อย 1", "title": "เจ้าหน้าที่กำลังพลน้อย", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png", "children": [
-                                            {"id": "node_16", "name": "พนักงานราชการ 1", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"},
-                                            {"id": "node_17", "name": "พนักงานราชการ 2", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
-                                        ]}
+                                        {
+                                            "id": "node_12", "name": "จนท.กำลังพลน้อย 1", "title": "จนท.กำลังพลน้อย", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png", 
+                                            "children": [
+                                                {"id": "node_17", "name": "พนักงานราชการ 1", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"},
+                                                {"id": "node_18", "name": "พนักงานราชการ 2", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                                            ]
+                                        }
                                     ]
                                 },
-                                {"id": "node_8", "name": "เจ้าหน้าที่กำลังพล 2", "title": "เจ้าหน้าที่กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                                {
+                                    "id": "node_8", "name": "จนท.กำลังพล 2", "title": "จนท.กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                                    "children": [
+                                        {"id": "node_13", "name": "จนท.กำลังพลน้อย 2", "title": "จนท.กำลังพลน้อย", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                                    ]
+                                }
                             ]
                         },
                         {
                             "id": "node_4", "name": "นายทหารกำลังพล 2", "title": "นายทหารกำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
                             "children": [
-                                {"id": "node_9", "name": "เจ้าหน้าที่กำลังพล 3", "title": "เจ้าหน้าที่กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                                {
+                                    "id": "node_9", "name": "จนท.กำลังพล 3", "title": "จนท.กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                                    "children": [
+                                        {"id": "node_14", "name": "จนท.กำลังพลน้อย 3", "title": "จนท.กำลังพลน้อย", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                                            "children": [
+                                                {"id": "node_19", "name": "พนักงานราชการ 3", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                                            ]
+                                        }
+                                    ]
+                                }
                             ]
                         },
                         {
                             "id": "node_5", "name": "นายทหารกำลังพล 3", "title": "นายทหารกำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
                             "children": [
-                                {"id": "node_10", "name": "เจ้าหน้าที่กำลังพล 4", "title": "เจ้าหน้าที่กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png", "children": [
-                                    {"id": "node_13", "name": "เจ้าหน้าที่กำลังพลน้อย 2", "title": "เจ้าหน้าที่กำลังพลน้อย", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png", "children": [
-                                        {"id": "node_18", "name": "พนักงานราชการ 3", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
-                                    ]}
-                                ]}
+                                {
+                                    "id": "node_10", "name": "จนท.กำลังพล 4", "title": "จนท.กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                                    "children": [
+                                        {"id": "node_15", "name": "จนท.กำลังพลน้อย 4", "title": "จนท.กำลังพลน้อย", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                                            "children": [
+                                                {"id": "node_20", "name": "พนักงานราชการ 4", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                                            ]
+                                        }
+                                    ]
+                                }
                             ]
                         },
                         {
                             "id": "node_6", "name": "นายทหารกำลังพล 4", "title": "นายทหารกำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
                             "children": [
-                                {"id": "node_11", "name": "เจ้าหน้าที่กำลังพล 5", "title": "เจ้าหน้าที่กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png", "children": [
-                                    {"id": "node_14", "name": "เจ้าหน้าที่กำลังพลน้อย 3", "title": "เจ้าหน้าที่กำลังพลน้อย", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png", "children": [
-                                        {"id": "node_19", "name": "พนักงานราชการ 4", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
-                                    ]}
-                                ]}
+                                {
+                                    "id": "node_11", "name": "จนท.กำลังพล 5", "title": "จนท.กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                                    "children": [
+                                        {"id": "node_16", "name": "จนท.กำลังพลน้อย 5", "title": "จนท.กำลังพลน้อย", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                                            "children": [
+                                                {"id": "node_21", "name": "พนักงานราชการ 5", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                                            ]
+                                        }
+                                    ]
+                                }
                             ]
                         },
                         
-                        // สายงานนายทหารสัสดี (2 คน)
+                        // สายงานนายทหารสัสดี (2 นาย)
                         {
                             "id": "s_node_1", "name": "นายทหารสัสดี 1", "title": "นายทหารสัสดี", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
                             "children": [
-                                {"id": "s_node_3", "name": "เจ้าหน้าที่สัสดี 1", "title": "เจ้าหน้าที่สัสดี", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png", "children": [
-                                    {"id": "node_15", "name": "เจ้าหน้าที่กำลังพลน้อย 4", "title": "เจ้าหน้าที่กำลังพลน้อย", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png", "children": [
-                                        {"id": "node_20", "name": "พนักงานราชการ 5", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
-                                    ]}
-                                ]}
+                                // จนท.สัสดี 1 นาย อยู่ภายใต้สายงานนี้
+                                {"id": "s_node_3", "name": "จนท.สัสดี 1", "title": "จนท.สัสดี", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
                             ]
                         },
                         {
-                            "id": "s_node_2", "name": "นายทหารสัสดี 2", "title": "นายทหารสัสดี", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
-                            "children": [
-                                {"id": "s_node_4", "name": "เจ้าหน้าที่สัสดี 2", "title": "เจ้าหน้าที่สัสดี", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
-                            ]
+                            "id": "s_node_2", "name": "นายทหารสัสดี 2", "title": "นายทหารสัสดี", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"
                         }
                     ]
                 }
             ]
         };
 
-        // 2. ฟังก์ชันเริ่มโหลดแผนภูมิองค์กร (ปิดระบบแพนและซูมของตัวผังใหญ่)
+        // 2. ฟังก์ชันเริ่มโหลดแผนภูมิองค์กร (ปิดระบบแพนและซูมของตัวผังใหญ่ทั้งหมด)
         function renderChart() {
             const savedData = localStorage.getItem("military_chart_db");
             currentChartData = savedData ? JSON.parse(savedData) : defaultData;
@@ -352,31 +379,28 @@
             $('#chart-container').html('');
             $('#chart-container').orgchart({
                 'data': currentChartData,
-                'pan': false,   /* ปิดการเคลื่อนไหวของผังใหญ่ */
-                'zoom': false,  /* ปิดการซูมของผังใหญ่ */
+                'pan': false,   
+                'zoom': false,  
                 'nodeContent': 'title'
             });
 
-            // ตรวจสอบเช็คสถานะล็อกอินแอดมินค้างไว้
             if(localStorage.getItem("is_military_admin") === "true") {
                 activateAdminUI();
             }
         }
 
-        // 3. ระบบคลิกโหนดเพื่อซูมเปิดเฉพาะ "การ์ดป๊อปอัป" ส่วนตัวผังใหญ่อยู่เฉยๆ
+        // 3. ระบบคลิกโหนดเพื่อเปิดเฉพาะ "ป๊อปอัปดีเทลที่มีเอฟเฟกต์ค่อยๆ ขยายตัว"
         $(document).on('click', '.node', function(e){
             e.stopPropagation(); 
             
             let nodeData = $(this).data('nodeData');
             selectedNodeId = nodeData.id;
 
-            // ส่งข้อมูลไปเซ็ตที่ตัวการ์ดรายละเอียด
             document.getElementById("personName").innerText = nodeData.name || '';
             document.getElementById("personPosition").innerText = nodeData.title || '';
             document.getElementById("personPhone").innerText = nodeData.phone || '-';
             document.getElementById("personPhoto").src = nodeData.photo || 'https://cdn-icons-png.flaticon.com/512/1869/1869679.png';
 
-            // จัดการหน้าฟอร์มแอดมิน
             if (isAdmin) {
                 document.getElementById("adminEditForm").style.display = "block";
                 document.getElementById("inputName").value = nodeData.name || '';
@@ -387,11 +411,10 @@
                 document.getElementById("adminEditForm").style.display = "none";
             }
 
-            // แสดงหน้าต่างป๊อปอัป (ตัวการ์ดด้านในจะรัน CSS ซูมเข้าอัตโนมัติ)
             document.getElementById("detailModal").style.display = "block";
         });
 
-        // ฟังก์ชันการปิดหน้าต่างป๊อปอัปเมื่อกดกากบาทหรือคลิกพื้นที่ว่างสีดำด้านนอก
+        // ฟังก์ชันการปิดหน้าต่างป๊อปอัป
         function closeModal() {
             document.getElementById("detailModal").style.display = "none";
         }
@@ -402,7 +425,7 @@
             }
         }
 
-        // 4. ระบบเปิดโหมดแอดมินและการเคลียร์สิทธิ์ออกจากระบบ
+        // 4. ระบบจัดการแอดมินโหมด
         document.getElementById("adminBtn").addEventListener("click", () => {
             const pass = prompt("กรุณากรอกรหัสผ่านแอดมินเพื่อแก้ไขผัง:");
             if (pass === ADMIN_PASSWORD) {
@@ -429,7 +452,7 @@
             closeModal();
         });
 
-        // 5. ฟังก์ชันวนลูปอัปเดตค่าลงกิ่งโครงสร้าง JSON
+        // 5. ฟังก์ชันวนลูปบันทึกย้อนกลับลงโครงสร้างข้อมูล JSON
         function updateNodeInJSON(targetData, idToFind, newName, newTitle, newPhone, newPhoto) {
             if (targetData.id === idToFind) {
                 targetData.name = newName;
@@ -447,7 +470,7 @@
             return false;
         }
 
-        // 6. บันทึกข้อมูลที่แอดมินแก้ไขลงฐานข้อมูลภายในเครื่อง
+        // 6. บันทึกข้อมูลที่แก้ไขลงฐานข้อมูลถาวรภายในเครื่องคอมพิวเตอร์
         document.getElementById("saveChangeBtn").addEventListener("click", () => {
             if (!isAdmin || !selectedNodeId) return;
 
@@ -461,10 +484,12 @@
 
             alert("บันทึกการแก้ไขสำเร็จ!");
             closeModal();
-            renderChart(); // อัปเดตการแสดงผลบนผังปิรามิดใหม่ทันที
+            renderChart(); 
         });
 
         document.addEventListener("DOMContentLoaded", renderChart);
     </script>
 </body>
 </html>
+
+```
