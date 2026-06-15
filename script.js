@@ -3,20 +3,20 @@ let isAdmin = false;
 let selectedNodeId = null;
 let rawChartData = null;
 
-// ปรับค่า URL ของ API หลังบ้าน (ถ้าเอาขึ้น Server จริงให้เปลี่ยน localhost เป็น IP หรือโดเมนของเซิร์ฟเวอร์)
-const BACKEND_API_URL = "http://10.237.129.212:3000/api/chart-data";
+// ⚠️ แก้ไขจุดนี้จุดเดียว: นำลิงก์ URL เว็บแอปที่ได้จาก Apps Script มาวางแทนที่ตรงนี้ครับ
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzL8Vl6GS-vbaQBAR9F636X6Cqh4oHI9_AJzBTkz-b1Ro7ciW0C5WRT3lcR0mQEXj2u/exec";
 
 function renderPyramidChart() {
-    // ดึงข้อมูลล่าสุดจากเซิร์ฟเวอร์หลักเสมอ เพื่อให้ทุกคนเห็นข้อมูลตรงกัน
-    fetch(BACKEND_API_URL)
+    // ดึงข้อมูลออนไลน์จาก Google Sheets ล่าสุดเสมอ
+    fetch(GOOGLE_APPS_SCRIPT_URL)
     .then(res => res.json())
     .then(jsonData => {
         rawChartData = jsonData;
         buildHtmlDOM(rawChartData);
     })
     .catch(err => {
-        console.error("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์หลังบ้านได้:", err);
-        alert("ตรวจพบข้อผิดพลาด: ไม่สามารถดึงข้อมูลจาก Server กลางได้ (คุณได้เปิดรันหลังบ้านหรือยัง?)");
+        console.error("ดาวน์โหลดข้อมูลล้มเหลว:", err);
+        alert("ไม่สามารถดึงข้อมูลผังจาก Google Sheets ได้ กรุณาตรวจสอบอินเทอร์เน็ตหรือลิงก์เชื่อมต่อ");
     });
 }
 
@@ -46,7 +46,7 @@ function buildHtmlDOM(layers) {
             `;
             
             card.onclick = () => {
-                selectedNodeId = person.id;
+                selectedNodeId = person.id; // เก็บ ID ไว้ใช้อัปเดตแถวใน Google Sheets
                 document.getElementById("personName").innerText = person.name;
                 document.getElementById("personPosition").innerText = person.title;
                 document.getElementById("personPhone").innerText = person.phone || '-';
@@ -78,7 +78,7 @@ function buildHtmlDOM(layers) {
     if(localStorage.getItem("admin_logged_in") === "true") activateAdmin();
 }
 
-// ควบคุมหน้าต่าง Popup ปิด
+// ควบคุมหน้าต่างป๊อปอัปดีเทล
 document.querySelector(".close").onclick = () => {
     document.getElementById("detailModal").style.display = "none";
 };
@@ -88,13 +88,13 @@ window.onclick = (e) => {
     }
 };
 
-// ระบบโหมดแอดมิน
+// ปุ่มเปิดโหมดแอดมินบนหน้าเว็บ (ปุ่มเฟือง)
 document.getElementById("adminBtn").addEventListener("click", () => {
     const pass = prompt("กรุณากรอกรหัสผ่านแอดมินเพื่อเปิดระบบแก้ไข:");
     if (pass === ADMIN_PASSWORD) {
         localStorage.setItem("admin_logged_in", "true");
         activateAdmin();
-        alert("เข้าสู่โหมดแอดมินสำเร็จ!");
+        alert("เข้าสู่โหมดแอดมินสำเร็จ! คลิกแก้ไขข้อมูลบนหน้าเว็บได้ทันทีครับ");
     } else if (pass !== null) {
         alert("รหัสผ่านไม่ถูกต้อง!");
     }
@@ -111,43 +111,40 @@ document.getElementById("logoutBtn").onclick = () => {
     location.reload();
 };
 
-// จุดสำคัญ: ส่งข้อมูลที่แก้ไขยิงกลับไปบันทึกถาวรที่ระบบหลังบ้าน
+// เมื่อแอดมินกดปุ่มบันทึกบนหน้าเว็บ ระบบจะยิงข้อมูลไปเขียนลงตาราง Google Sheets ให้อัตโนมัติ
 document.getElementById("saveChangeBtn").onclick = () => {
-    if(!rawChartData) return;
-    
-    let isFound = false;
-    for (let layer of rawChartData) {
-        let p = layer.people.find(person => person.id === selectedNodeId);
-        if(p) {
-            p.name = document.getElementById("inputName").value;
-            p.title = document.getElementById("inputPosition").value;
-            p.phone = document.getElementById("inputPhone").value;
-            p.photo = document.getElementById("inputPhoto").value;
-            isFound = true;
-            break;
-        }
-    }
-    
-    if(isFound) {
-        // ยิง API แบบ POST เพื่อไปอัปเดตไฟล์ข้อมูลตัวกลางบน Server
-        fetch(BACKEND_API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(rawChartData)
-        })
-        .then(res => {
-            if(res.ok) {
-                alert("บันทึกข้อมูลเรียบร้อยแล้ว! ทุกคนที่เข้ามาดูจะเห็นข้อมูลล่าสุดทันทีครับ");
-                location.reload();
-            } else {
-                alert("เกิดข้อผิดพลาดในการบันทึกลง Server หลังบ้าน");
-            }
-        })
-        .catch(err => {
-            console.error("เซฟไม่สำเร็จ:", err);
-            alert("ไม่สามารถติดต่อเซิร์ฟเวอร์เพื่อบันทึกข้อมูลได้");
-        });
-    }
+    const updatePayload = {
+        id: selectedNodeId,
+        name: document.getElementById("inputName").value,
+        title: document.getElementById("inputPosition").value,
+        phone: document.getElementById("inputPhone").value,
+        photo: document.getElementById("inputPhoto").value
+    };
+
+    const saveBtn = document.getElementById("saveChangeBtn");
+    saveBtn.innerText = "SAVING... ⏳";
+    saveBtn.disabled = true;
+
+    // ยิงแบบ POST ส่งไปให้ Google Apps Script ปลายทางทำงาน
+    fetch(GOOGLE_APPS_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors", // ใช้โหมดนี้เพื่อให้ส่งข้อมูลหาเซิร์ฟเวอร์ Google ได้โดยตรงไม่ติด CORS
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatePayload)
+    })
+    .then(() => {
+        // รอระบบ Google อัปเดตข้อมูลลงชีตสักครู่ แล้วรีเฟรชหน้าเว็บดึงค่าใหม่
+        setTimeout(() => {
+            alert("บันทึกข้อมูลสำเร็จ! ซิงค์ขึ้น Google Sheets เรียบร้อยแล้ว คนอื่นจะเห็นข้อมูลล่าสุดทันทีครับ");
+            location.reload();
+        }, 1500);
+    })
+    .catch(err => {
+        console.error("เซฟล้มเหลว:", err);
+        alert("ไม่สามารถเชื่อมต่อเพื่อบันทึกข้อมูลออนไลน์ได้");
+        saveBtn.innerText = "SAVE CHANGES";
+        saveBtn.disabled = false;
+    });
 };
 
 document.addEventListener("DOMContentLoaded", renderPyramidChart);
