@@ -13,10 +13,11 @@
             background: #f4f6f9;
             padding: 20px;
             margin: 0;
-            overflow: hidden; /* ป้องกันการสกรอลล์ซ้ำซ้อนภายนอก */
+            overflow-x: auto; /* เปิดสกรอลล์แนวนอนกรณีหน้าจอเล็กกว่าขนาดผัง */
             height: 100vh;
             display: flex;
             flex-direction: column;
+            box-sizing: border-box;
         }
 
         h1 {
@@ -25,52 +26,39 @@
             margin: 10px 0 20px 0;
         }
 
-        /* แอนิเมชัน ค่อยๆ ขยายผังองค์กรออกมาตอนโหลดหน้าเว็บ */
-        @keyframes expandIn {
-            from {
-                opacity: 0;
-                transform: scale(0.85);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        /* ปรับปรุง Container จัดวางผังให้อยู่กึ่งกลางเสมอ */
+        /* Container บังคับผังล็อกนิ่งตรงกลางเป็นทรงปิรามิด */
         #chart-container {
             flex-grow: 1;
-            overflow: hidden; /* ปิด Scrollbar เพื่อใช้ระบบคลิกซูมแทน */
             border: 1px solid #e5e7eb;
             background: #ffffff;
             border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
             position: relative;
+            padding: 40px 20px;
             
-            /* จัดการด้านในให้อยู่ตรงกลาง */
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding-top: 40px;
+            /* เทคนิคจัดกึ่งกลางปิรามิด */
+            display: block;
+            text-align: center;
+            min-width: max-content; /* ป้องกันผังเบียดกันเมื่อย่อหน้าจอ */
         }
 
-        /* ควบคุมการจัดตำแหน่งของตัว OrgChart ด้านใน */
+        /* จัดระเบียบเส้นและกล่อง OrgChart ให้อยู่กึ่งกลางสมมาตร */
         .orgchart {
             background: transparent !important;
+            display: inline-block !important;
             margin: 0 auto !important;
-            padding: 0 !important;
-            display: inline-block;
-            transform-origin: center top; /* กำหนดจุดหมุนสำหรับการซูมเข้า-ออก */
-            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); /* เอฟเฟกต์ซูมที่ลื่นไหล */
+            float: none !important;
         }
 
-        /* ตกแต่งหน้าตาของโหนด (กล่องข้อความ) */
+        /* ตกแต่งหน้าตาของการ์ดบุคคล (โหนด) */
         .orgchart .node {
             width: 150px !important;
-            transition: background-color 0.3s, box-shadow 0.3s;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
         }
         .orgchart .node:hover {
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 12px -3px rgba(0,0,0,0.15);
         }
 
         /* สไตล์ปุ่มเฟืองแอดมิน */
@@ -102,7 +90,6 @@
             top: 20px;
             right: 20px;
             z-index: 999;
-            display: none;
             gap: 10px;
             align-items: center;
         }
@@ -131,7 +118,7 @@
             background: #1f2937;
         }
 
-        /* สไตล์ Modal (ป๊อปอัปแสดงผล/แก้ไข) */
+        /* สไตล์หน้าต่างพื้นหลังป๊อปอัป */
         .modal {
             display: none;
             position: fixed;
@@ -141,27 +128,47 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,.5);
-            backdrop-filter: blur(3px);
+            backdrop-filter: blur(4px);
+            transition: opacity 0.3s ease;
         }
 
+        /* แอนิเมชันสำหรับค่อยๆ ซูมขยายตัวการ์ดข้อมูลบุคคลขึ้นมาเฉพาะส่วน */
+        @keyframes zoomInCard {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.7);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        /* กล่องเนื้อหาป๊อปอัปบุคคลที่ถูกตั้งค่าให้ซูมเด่นขึ้นมา */
         .modal-content {
             background: white;
-            width: 360px;
-            margin: 10% auto;
-            padding: 25px;
-            border-radius: 15px;
+            width: 380px;
+            padding: 30px;
+            border-radius: 20px;
             text-align: center;
-            position: relative;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            
+            /* ล็อกให้อยู่กลางหน้าจอพิกัดสัมบูรณ์เพื่อทำเอฟเฟกต์ซูมตัวการ์ด */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            animation: zoomInCard 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
         #personPhoto {
-            width: 130px;
-            height: 130px;
+            width: 140px;
+            height: 140px;
             border-radius: 50%;
             object-fit: cover;
             border: 4px solid #f3f4f6;
             margin-bottom: 15px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
 
         .close {
@@ -171,13 +178,14 @@
             cursor: pointer;
             font-size: 28px;
             color: #9ca3af;
+            transition: color 0.2s;
         }
         .close:hover { color: #111827; }
 
-        /* ฟอร์มอินพุตสำหรับโหมดแก้ไขของแอดมิน */
+        /* ฟอร์มอินพุตแก้ไขของแอดมิน */
         .edit-form {
             display: none;
-            margin-top: 15px;
+            margin-top: 20px;
             text-align: left;
             border-top: 1px solid #e5e7eb;
             padding-top: 15px;
@@ -187,24 +195,28 @@
             color: #6b7280;
             display: block;
             margin-bottom: 5px;
+            font-weight: bold;
         }
         .edit-form input {
             width: 100%;
-            padding: 8px;
-            margin-bottom: 12px;
+            padding: 9px;
+            margin-bottom: 14px;
             border: 1px solid #d1d5db;
-            border-radius: 6px;
+            border-radius: 8px;
             box-sizing: border-box;
+            font-family: inherit;
         }
         .save-btn {
             width: 100%;
             background: #10b981;
             color: white;
             border: none;
-            padding: 10px;
-            border-radius: 6px;
+            padding: 11px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 15px;
+            transition: background 0.2s;
         }
         .save-btn:hover { background: #059669; }
     </style>
@@ -227,10 +239,10 @@
             <span class="close">&times;</span>
             
             <img id="personPhoto" src="" alt="รูปภาพประจำตัว">
-            <h2 id="personName" style="margin:5px 0;"></h2>
-            <p id="personPosition" style="color:#6b7280; margin:5px 0; font-weight:bold;"></p>
-            <p style="margin: 8px 0; font-size: 15px; color: #374151;">
-                📞 เบอร์โทรศัพท์: <span id="personPhone" style="font-weight: bold; color: #10b981;">-</span>
+            <h2 id="personName" style="margin:5px 0; color:#111827;"></h2>
+            <p id="personPosition" style="color:#4b5563; margin:5px 0; font-weight:bold; font-size:15px;"></p>
+            <p style="margin: 12px 0 5px 0; font-size: 15px; color: #1f2937;">
+                📞 เบอร์โทรศัพท์: <span id="personPhone" style="font-weight: bold; color: #2563eb;">-</span>
             </p>
 
             <div id="adminEditForm" class="edit-form">
@@ -243,7 +255,7 @@
                 <label>แก้ไขเบอร์โทรศัพท์:</label>
                 <input type="text" id="inputPhone" placeholder="เช่น 081-xxxxxxx">
                 
-                <label>ลิงก์ที่อยู่รูปภาพ (URL หรือโฟลเดอร์ เช่น photos/name.jpg):</label>
+                <label>ลิงก์ที่อยู่รูปภาพ (URL หรือเช่น photos/name.jpg):</label>
                 <input type="text" id="inputPhoto">
                 
                 <button class="save-btn" id="saveChangeBtn">💾 บันทึกการเปลี่ยนแปลง</button>
@@ -260,7 +272,7 @@
         let selectedNodeId = null; 
         let currentChartData = null; 
 
-        // 1. โครงสร้างข้อมูลตั้งต้น (รวม 24 คน พร้อมโครงสร้างตรงเป๊ะ และเพิ่มฟิลด์ phone)
+        // 1. โครงสร้างข้อมูลปิรามิด 5 ระดับ (หัวหน้า 1 -> รอง 1 -> นายทหาร 6 -> เจ้าหน้าที่ 11 -> พนักงาน 5)
         const defaultData = {
             "id": "node_1", "name": "หัวหน้า 1", "title": "หัวหน้าแผนก", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
             "children": [
@@ -332,7 +344,7 @@
             ]
         };
 
-        // 2. ฟังก์ชันเริ่มโหลดแผนภูมิองค์กร (ปิดแพนและซูมแบบเดิมออก)
+        // 2. ฟังก์ชันเริ่มโหลดแผนภูมิองค์กร (ปิดระบบแพนและซูมของตัวผังใหญ่)
         function renderChart() {
             const savedData = localStorage.getItem("military_chart_db");
             currentChartData = savedData ? JSON.parse(savedData) : defaultData;
@@ -340,35 +352,31 @@
             $('#chart-container').html('');
             $('#chart-container').orgchart({
                 'data': currentChartData,
-                'pan': false,   /* ปิดการเคลื่อนย้ายแบบเดิม */
-                'zoom': false,  /* ปิดการซูมแบบเดิม */
+                'pan': false,   /* ปิดการเคลื่อนไหวของผังใหญ่ */
+                'zoom': false,  /* ปิดการซูมของผังใหญ่ */
                 'nodeContent': 'title'
             });
 
-            // ตรวจสอบเช็คสถานะล็อกอินค้างไว้หรือไม่
+            // ตรวจสอบเช็คสถานะล็อกอินแอดมินค้างไว้
             if(localStorage.getItem("is_military_admin") === "true") {
                 activateAdminUI();
             }
         }
 
-        // 3. ระบบจัดการคลิกโหนดเพื่อซูม และกดพื้นที่ว่างเพื่อซูมออก
+        // 3. ระบบคลิกโหนดเพื่อซูมเปิดเฉพาะ "การ์ดป๊อปอัป" ส่วนตัวผังใหญ่อยู่เฉยๆ
         $(document).on('click', '.node', function(e){
-            e.stopPropagation(); // หยุดการส่งเหตุการณ์ไปยัง container ด้านหลัง
+            e.stopPropagation(); 
             
             let nodeData = $(this).data('nodeData');
             selectedNodeId = nodeData.id;
 
-            // เอฟเฟกต์ซูมเข้า: ขยายขนาดผังและโฟกัสไปที่วัตถุ
-            $('.orgchart').css({
-                'transform': 'scale(1.35) translateY(20px)'
-            });
-
-            // แสดงผลป๊อปอัปดีเทล
+            // ส่งข้อมูลไปเซ็ตที่ตัวการ์ดรายละเอียด
             document.getElementById("personName").innerText = nodeData.name || '';
             document.getElementById("personPosition").innerText = nodeData.title || '';
             document.getElementById("personPhone").innerText = nodeData.phone || '-';
             document.getElementById("personPhoto").src = nodeData.photo || 'https://cdn-icons-png.flaticon.com/512/1869/1869679.png';
 
+            // จัดการหน้าฟอร์มแอดมิน
             if (isAdmin) {
                 document.getElementById("adminEditForm").style.display = "block";
                 document.getElementById("inputName").value = nodeData.name || '';
@@ -379,28 +387,28 @@
                 document.getElementById("adminEditForm").style.display = "none";
             }
 
+            // แสดงหน้าต่างป๊อปอัป (ตัวการ์ดด้านในจะรัน CSS ซูมเข้าอัตโนมัติ)
             document.getElementById("detailModal").style.display = "block";
         });
 
-        // เมื่อคลิกพื้นที่ว่างในกล่อง หรือจุดอื่นๆ ผังจะซูมออกกลับมาตรงกลางเท่าเดิม
-        $('#chart-container').on('click', function() {
-            $('.orgchart').css({
-                'transform': 'scale(1) translateY(0px)'
-            });
-        });
-
-        // ปุ่มกากบาทปิด Modal
-        document.querySelector(".close").onclick = () => {
+        // ฟังก์ชันการปิดหน้าต่างป๊อปอัปเมื่อกดกากบาทหรือคลิกพื้นที่ว่างสีดำด้านนอก
+        function closeModal() {
             document.getElementById("detailModal").style.display = "none";
-        };
+        }
+        document.querySelector(".close").onclick = closeModal;
+        window.onclick = function(event) {
+            if (event.target == document.getElementById("detailModal")) {
+                closeModal();
+            }
+        }
 
-        // 4. ระบบการล็อกอินและจัดการแถบแอดมิน
+        // 4. ระบบเปิดโหมดแอดมินและการเคลียร์สิทธิ์ออกจากระบบ
         document.getElementById("adminBtn").addEventListener("click", () => {
             const pass = prompt("กรุณากรอกรหัสผ่านแอดมินเพื่อแก้ไขผัง:");
             if (pass === ADMIN_PASSWORD) {
                 localStorage.setItem("is_military_admin", "true");
                 activateAdminUI();
-                alert("เข้าสู่โหมดผู้ดูแลระบบสำเร็จ!");
+                alert("เข้าสู่โหมดผู้ดูแลระบบสำเร็จ! สามารถคลิกกล่องบุคคลเพื่อแก้ไขได้ทันที");
             } else if (pass !== null) {
                 alert("รหัสผ่านไม่ถูกต้อง!");
             }
@@ -409,20 +417,19 @@
         function activateAdminUI() {
             isAdmin = true;
             document.getElementById("adminStatusBar").style.display = "flex";
-            document.getElementById("adminBtn").style.display = "none"; // ซ่อนปุ่มเฟืองชั่วคราว
+            document.getElementById("adminBtn").style.display = "none"; 
         }
 
-        // ปุ่มออกจากระบบแอดมิน
         document.getElementById("logoutBtn").addEventListener("click", () => {
             isAdmin = false;
             localStorage.setItem("is_military_admin", "false");
             document.getElementById("adminStatusBar").style.display = "none";
-            document.getElementById("adminBtn").style.display = "block"; // แสดงปุ่มเฟืองกลับมา
+            document.getElementById("adminBtn").style.display = "block"; 
             alert("ออกจากระบบแอดมินเรียบร้อยแล้ว");
-            document.getElementById("detailModal").style.display = "none";
+            closeModal();
         });
 
-        // 5. ฟังก์ชันค้นหาและอัปเดตข้อมูลย้อนกลับเข้าไปในโครงสร้าง JSON
+        // 5. ฟังก์ชันวนลูปอัปเดตค่าลงกิ่งโครงสร้าง JSON
         function updateNodeInJSON(targetData, idToFind, newName, newTitle, newPhone, newPhoto) {
             if (targetData.id === idToFind) {
                 targetData.name = newName;
@@ -440,7 +447,7 @@
             return false;
         }
 
-        // 6. กดบันทึกการแก้ไขข้อมูลบุคคล
+        // 6. บันทึกข้อมูลที่แอดมินแก้ไขลงฐานข้อมูลภายในเครื่อง
         document.getElementById("saveChangeBtn").addEventListener("click", () => {
             if (!isAdmin || !selectedNodeId) return;
 
@@ -450,18 +457,13 @@
             const newPhoto = document.getElementById("inputPhoto").value;
 
             updateNodeInJSON(currentChartData, selectedNodeId, newName, newTitle, newPhone, newPhoto);
-
-            // บันทึกลงเครื่อง
             localStorage.setItem("military_chart_db", JSON.stringify(currentChartData));
 
-            alert("บันทึกข้อมูลเรียบร้อยแล้ว!");
-            document.getElementById("detailModal").style.display = "none";
-            
-            // รีโหลดแผนภูมิแสดงผลใหม่บนจอ
-            renderChart();
+            alert("บันทึกการแก้ไขสำเร็จ!");
+            closeModal();
+            renderChart(); // อัปเดตการแสดงผลบนผังปิรามิดใหม่ทันที
         });
 
-        // สั่งทำงานเมื่อเอกสารพร้อมใช้งาน
         document.addEventListener("DOMContentLoaded", renderChart);
     </script>
 </body>
