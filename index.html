@@ -1,10 +1,3 @@
-รับทราบครับ! มีการปรับเปลี่ยนจำนวนบุคลากรในบางตำแหน่งจากรอบก่อนหน้า (รอบนี้ปรับเป็น: เจ้าหน้าที่กำลังพล 5 / เจ้าหน้าที่กำลังพลน้อย 5 / เจ้าหน้าที่สัสดี 1)
-
-ผมได้นำข้อมูลจำนวนล่าสุดนี้ไปจัดโครงสร้างใหม่ให้เป็นทรงปิรามิดที่สมดุล โดยให้**หัวหน้าอยู่ตรงกลางบนสุด และผังใหญ่ล็อกนิ่งไม่มีการขยับ** ส่วน**ระบบซูมจะทำงานเฉพาะการ์ดบุคคล (Modal)** ที่เด้งขยายตัวนุ่มนวลขึ้นมาเมื่อกดคลิกตามที่คุณต้องการเป๊ะ ๆ เลยครับ
-
-คุณสามารถคัดลอกโค้ดทั้งหมดด้านล่างนี้ ไปวางทับในไฟล์ `index.html` เพียงไฟล์เดียวได้เลยครับ:
-
-```html
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -20,7 +13,7 @@
             background: #f4f6f9;
             padding: 20px;
             margin: 0;
-            overflow-x: auto; /* เปิดสกรอลล์แนวนอนกรณีหน้าจอเล็กกว่าขนาดผัง */
+            overflow-x: auto; /* เปิด Scrollbar แนวนอนเผื่อกรณีหน้าจอแคบกว่าผัง */
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -33,7 +26,7 @@
             margin: 10px 0 20px 0;
         }
 
-        /* Container บังคับผังล็อกนิ่งตรงกลางเป็นทรงปิรามิด */
+        /* Container ล็อกผังนิ่งให้อยู่กึ่งกลางหน้าจอเสมอ */
         #chart-container {
             flex-grow: 1;
             border: 1px solid #e5e7eb;
@@ -42,14 +35,12 @@
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
             position: relative;
             padding: 40px 20px;
-            
-            /* เทคนิคจัดกึ่งกลางปิรามิด */
             display: block;
             text-align: center;
-            min-width: max-content; /* ป้องกันผังเบียดกันเมื่อย่อหน้าจอ */
+            min-width: max-content; /* บังคับผังไม่ให้เบียดเสียทรง */
         }
 
-        /* จัดระเบียบเส้นและกล่อง OrgChart ให้อยู่กึ่งกลางสมมาตร */
+        /* จัดแต่งให้ตัว OrgChart แตกกิ่งสมดุลเป็นทรงปิรามิด */
         .orgchart {
             background: transparent !important;
             display: inline-block !important;
@@ -57,9 +48,9 @@
             float: none !important;
         }
 
-        /* ตกแต่งหน้าตาของการ์ดบุคคล (โหนด) */
+        /* หน้าตากล่องบุคคล (โหนด) */
         .orgchart .node {
-            width: 150px !important;
+            width: 155px !important;
             transition: transform 0.2s, box-shadow 0.2s;
             cursor: pointer;
         }
@@ -90,7 +81,7 @@
             background: #374151;
         }
 
-        /* แถบแจ้งเตือนและปุ่มควบคุมของแอดมินด้านบน */
+        /* แถบแอดมินด้านบนมุมขวา */
         #adminStatusBar {
             display: none;
             position: fixed;
@@ -125,7 +116,7 @@
             background: #1f2937;
         }
 
-        /* สไตล์หน้าต่างพื้นหลังป๊อปอัป */
+        /* สไตล์หน้าต่าง Pop-up แสดงรายละเอียด */
         .modal {
             display: none;
             position: fixed;
@@ -138,7 +129,7 @@
             backdrop-filter: blur(4px);
         }
 
-        /* แอนิเมชันสำหรับค่อยๆ ซูมขยายตัวการ์ดข้อมูลบุคคลขึ้นมาเฉพาะส่วน */
+        /* เอฟเฟกต์ซูมเข้าเฉพาะตัวการ์ดข้อมูลส่วนบุคคล */
         @keyframes zoomInCard {
             from {
                 opacity: 0;
@@ -150,7 +141,6 @@
             }
         }
 
-        /* กล่องเนื้อหาป๊อปอัปบุคคลที่ถูกตั้งค่าให้ซูมเด่นขึ้นมา */
         .modal-content {
             background: white;
             width: 380px;
@@ -158,8 +148,6 @@
             border-radius: 20px;
             text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-            
-            /* ล็อกให้อยู่กลางหน้าจอพิกัดสัมบูรณ์เพื่อทำเอฟเฟกต์ซูมตัวการ์ด */
             position: fixed;
             top: 50%;
             left: 50%;
@@ -188,7 +176,7 @@
         }
         .close:hover { color: #111827; }
 
-        /* ฟอร์มอินพุตแก้ไขของแอดมิน */
+        /* ส่วนกรอกข้อมูลแอดมิน */
         .edit-form {
             display: none;
             margin-top: 20px;
@@ -232,7 +220,7 @@
     <h1>ผังองค์กรกำลังพลและสายงานสัสดี</h1>
     
     <div id="adminStatusBar">
-        <div id="adminBadge">🔴 โหมดแอดมิน (คลิกโหนดเพื่อแก้ไข)</div>
+        <div id="adminBadge">🔴 โหมดแอดมิน (คลิกล่องบุคคลเพื่อแก้ไข)</div>
         <button id="logoutBtn">ออกจากระบบแอดมิน 🔓</button>
     </div>
 
@@ -244,7 +232,7 @@
         <div class="modal-content">
             <span class="close">&times;</span>
             
-            <img id="personPhoto" src="" alt="รูปภาพประจำตัว">
+            <img id="personPhoto" src="" alt="รูปประจำตัว">
             <h2 id="personName" style="margin:5px 0; color:#111827;"></h2>
             <p id="personPosition" style="color:#4b5563; margin:5px 0; font-weight:bold; font-size:15px;"></p>
             <p style="margin: 12px 0 5px 0; font-size: 15px; color: #1f2937;">
@@ -261,7 +249,7 @@
                 <label>แก้ไขเบอร์โทรศัพท์:</label>
                 <input type="text" id="inputPhone" placeholder="เช่น 081-xxxxxxx">
                 
-                <label>ลิงก์ที่อยู่รูปภาพ (URL หรือเช่น photos/name.jpg):</label>
+                <label>ลิงก์ที่อยู่รูปภาพ (URL หรือโฟลเดอร์เช่น photos/name.jpg):</label>
                 <input type="text" id="inputPhoto">
                 
                 <button class="save-btn" id="saveChangeBtn">💾 บันทึกการเปลี่ยนแปลง</button>
@@ -278,76 +266,79 @@
         let selectedNodeId = null; 
         let currentChartData = null; 
 
-        // 1. จัดโครงสร้างผังตามลำดับข้อมูลล่าสุดที่ระบุมาเป๊ะ ๆ
+        // 1. ตรวจสอบแก้ไของค์ประกอบโครงสร้าง JSON ให้แตกกิ่งตรงตามผังปิรามิดชั้นลำดับอย่างแม่นยำ
         const defaultData = {
             "id": "node_1", "name": "หัวหน้า", "title": "หัวหน้า", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
             "children": [
                 {
                     "id": "node_2", "name": "รองหัวหน้า", "title": "รองหัวหน้า", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
                     "children": [
-                        // สายงานนายทหารกำลังพล (4 นาย)
+                        // ระดับชั้น: นายทหารกำลังพล 4 นาย
                         {
-                            "id": "node_3", "name": "นายทหารกำลังพล 1", "title": "นายทหารกำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                            "id": "m_kp_1", "name": "นายทหารกำลังพล 1", "title": "นายทหารกำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
                             "children": [
                                 {
-                                    "id": "node_7", "name": "จนท.กำลังพล 1", "title": "จนท.กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                                    "id": "kp_1", "name": "จนท.กำลังพล 1", "title": "จนท.กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
                                     "children": [
                                         {
-                                            "id": "node_12", "name": "จนท.กำลังพลน้อย 1", "title": "จนท.กำลังพลน้อย", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png", 
+                                            "id": "kp_n_1", "name": "จนท.กำลังพลน้อย 1", "title": "จนท.กำลังพลน้อย", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
                                             "children": [
-                                                {"id": "node_17", "name": "พนักงานราชการ 1", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"},
-                                                {"id": "node_18", "name": "พนักงานราชการ 2", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                                                {"id": "pw_1", "name": "พนักงานราชการ 1", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"},
+                                                {"id": "pw_2", "name": "พนักงานราชการ 2", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "m_kp_2", "name": "นายทหารกำลังพล 2", "title": "นายทหารกำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                            "children": [
+                                {
+                                    "id": "kp_2", "name": "จนท.กำลังพล 2", "title": "จนท.กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                                    "children": [
+                                        {"id": "kp_n_2", "name": "จนท.กำลังพลน้อย 2", "title": "จนท.กำลังพลน้อย", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "m_kp_3", "name": "นายทหารกำลังพล 3", "title": "นายทหารกำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                            "children": [
+                                {
+                                    "id": "kp_3", "name": "จนท.กำลังพล 3", "title": "จนท.กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                                    "children": [
+                                        {
+                                            "id": "kp_n_3", "name": "จนท.กำลังพลน้อย 3", "title": "จนท.กำลังพลน้อย", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                                            "children": [
+                                                {"id": "pw_3", "name": "พนักงานราชการ 3", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "m_kp_4", "name": "นายทหารกำลังพล 4", "title": "นายทหารกำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                            "children": [
+                                {
+                                    "id": "kp_4", "name": "จนท.กำลังพล 4", "title": "จนท.กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                                    "children": [
+                                        {
+                                            "id": "kp_n_4", "name": "จนท.กำลังพลน้อย 4", "title": "จนท.กำลังพลน้อย", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                                            "children": [
+                                                {"id": "pw_4", "name": "พนักงานราชการ 4", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
                                             ]
                                         }
                                     ]
                                 },
                                 {
-                                    "id": "node_8", "name": "จนท.กำลังพล 2", "title": "จนท.กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                                    "id": "kp_5", "name": "จนท.กำลังพล 5", "title": "จนท.กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
                                     "children": [
-                                        {"id": "node_13", "name": "จนท.กำลังพลน้อย 2", "title": "จนท.กำลังพลน้อย", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "node_4", "name": "นายทหารกำลังพล 2", "title": "นายทหารกำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
-                            "children": [
-                                {
-                                    "id": "node_9", "name": "จนท.กำลังพล 3", "title": "จนท.กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
-                                    "children": [
-                                        {"id": "node_14", "name": "จนท.กำลังพลน้อย 3", "title": "จนท.กำลังพลน้อย", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                                        {
+                                            "id": "kp_n_5", "name": "จนท.กำลังพลน้อย 5", "title": "จนท.กำลังพลน้อย", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
                                             "children": [
-                                                {"id": "node_19", "name": "พนักงานราชการ 3", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "node_5", "name": "นายทหารกำลังพล 3", "title": "นายทหารกำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
-                            "children": [
-                                {
-                                    "id": "node_10", "name": "จนท.กำลังพล 4", "title": "จนท.กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
-                                    "children": [
-                                        {"id": "node_15", "name": "จนท.กำลังพลน้อย 4", "title": "จนท.กำลังพลน้อย", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
-                                            "children": [
-                                                {"id": "node_20", "name": "พนักงานราชการ 4", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "id": "node_6", "name": "นายทหารกำลังพล 4", "title": "นายทหารกำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
-                            "children": [
-                                {
-                                    "id": "node_11", "name": "จนท.กำลังพล 5", "title": "จนท.กำลังพล", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
-                                    "children": [
-                                        {"id": "node_16", "name": "จนท.กำลังพลน้อย 5", "title": "จนท.กำลังพลน้อย", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
-                                            "children": [
-                                                {"id": "node_21", "name": "พนักงานราชการ 5", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                                                {"id": "pw_5", "name": "พนักงานราชการ 5", "title": "พนักงานราชการ", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
                                             ]
                                         }
                                     ]
@@ -355,23 +346,23 @@
                             ]
                         },
                         
-                        // สายงานนายทหารสัสดี (2 นาย)
+                        // ระดับชั้น: นายทหารสัสดี 2 นาย (แยกฝั่งขวา)
                         {
-                            "id": "s_node_1", "name": "นายทหารสัสดี 1", "title": "นายทหารสัสดี", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                            "id": "m_ss_1", "name": "นายทหารสัสดี 1", "title": "นายทหารสัสดี", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
                             "children": [
-                                // จนท.สัสดี 1 นาย อยู่ภายใต้สายงานนี้
-                                {"id": "s_node_3", "name": "จนท.สัสดี 1", "title": "จนท.สัสดี", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                                // จนท.สัสดี 1 นาย อยู่ในระดับชั้นถัดลงมาเทียบเท่ากับ จนท.กำลังพลน้อย
+                                {"id": "ss_1", "name": "จนท.สัสดี 1", "title": "จนท.สัสดี", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
                             ]
                         },
                         {
-                            "id": "s_node_2", "name": "นายทหารสัสดี 2", "title": "นายทหารสัสดี", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"
+                            "id": "m_ss_2", "name": "นายทหารสัสดี 2", "title": "นายทหารสัสดี", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"
                         }
                     ]
                 }
             ]
         };
 
-        // 2. ฟังก์ชันเริ่มโหลดแผนภูมิองค์กร (ปิดระบบแพนและซูมของตัวผังใหญ่ทั้งหมด)
+        // 2. ฟังก์ชันเรนเดอร์ OrgChart แบบล็อกตำแหน่งนิ่งกึ่งกลาง
         function renderChart() {
             const savedData = localStorage.getItem("military_chart_db");
             currentChartData = savedData ? JSON.parse(savedData) : defaultData;
@@ -389,7 +380,7 @@
             }
         }
 
-        // 3. ระบบคลิกโหนดเพื่อเปิดเฉพาะ "ป๊อปอัปดีเทลที่มีเอฟเฟกต์ค่อยๆ ขยายตัว"
+        // 3. ระบบคลิกโหนดเพื่อขยายซูมเฉพาะการ์ดป๊อปอัปดีเทล (ตัวผังใหญ่นิ่งสนิท)
         $(document).on('click', '.node', function(e){
             e.stopPropagation(); 
             
@@ -414,7 +405,6 @@
             document.getElementById("detailModal").style.display = "block";
         });
 
-        // ฟังก์ชันการปิดหน้าต่างป๊อปอัป
         function closeModal() {
             document.getElementById("detailModal").style.display = "none";
         }
@@ -425,13 +415,13 @@
             }
         }
 
-        // 4. ระบบจัดการแอดมินโหมด
+        // 4. ระบบจัดการแอดมินและการลงชื่อออก
         document.getElementById("adminBtn").addEventListener("click", () => {
             const pass = prompt("กรุณากรอกรหัสผ่านแอดมินเพื่อแก้ไขผัง:");
             if (pass === ADMIN_PASSWORD) {
                 localStorage.setItem("is_military_admin", "true");
                 activateAdminUI();
-                alert("เข้าสู่โหมดผู้ดูแลระบบสำเร็จ! สามารถคลิกกล่องบุคคลเพื่อแก้ไขได้ทันที");
+                alert("เข้าสู่โหมดผู้ดูแลระบบสำเร็จ! คลิกเลือกบุคคลที่ผังเพื่อทำการบันทึกข้อมูลแก้ไขได้ทันที");
             } else if (pass !== null) {
                 alert("รหัสผ่านไม่ถูกต้อง!");
             }
@@ -452,7 +442,7 @@
             closeModal();
         });
 
-        // 5. ฟังก์ชันวนลูปบันทึกย้อนกลับลงโครงสร้างข้อมูล JSON
+        // 5. ค้นหาและอัปเดตข้อมูลบุคคลเข้าโครงสร้าง JSON
         function updateNodeInJSON(targetData, idToFind, newName, newTitle, newPhone, newPhoto) {
             if (targetData.id === idToFind) {
                 targetData.name = newName;
@@ -470,7 +460,7 @@
             return false;
         }
 
-        // 6. บันทึกข้อมูลที่แก้ไขลงฐานข้อมูลถาวรภายในเครื่องคอมพิวเตอร์
+        // 6. กดบันทึกเพื่อจัดเก็บข้อมูลแบบถาวรในคอมพิวเตอร์
         document.getElementById("saveChangeBtn").addEventListener("click", () => {
             if (!isAdmin || !selectedNodeId) return;
 
@@ -491,5 +481,3 @@
     </script>
 </body>
 </html>
-
-```
