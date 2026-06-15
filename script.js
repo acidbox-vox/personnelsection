@@ -7,54 +7,48 @@ let rawChartData = null;
 function transformTreeToLayers(treeData) {
     const layers = {};
     
-    // ใส่ข้อมูลจำลองรายชื่อตามกระดานจริงของคุณเพื่อจัดตำแหน่งเบื้องต้น
-    // ชั้น 1: หัวหน้า
+    // ชั้น 1: หัวหน้า (ยอดบนสุด)
     layers[1] = [ { id: treeData.id, name: treeData.name, title: treeData.title, phone: treeData.phone || '-', photo: treeData.photo || '' } ];
     
-    // ชั้น 2: รองหัวหน้า
-    layers[2] = [];
-    if(treeData.children) {
-        treeData.children.forEach(c => {
-            layers[2].push({ id: c.id, name: c.name, title: c.title, phone: c.phone || '-', photo: c.photo || '' });
-        });
-    }
+    // ชั้น 2: รองหัวหน้า (ปรับเหลือ 1 คนถ้วนตามแจ้ง)
+    layers[2] = [ { id: "r2_deputy_single", name: "รองหัวหน้า", title: "รองหัวหน้า", phone: "-", photo: "" } ];
 
     // ชั้น 3: นายทหาร (มี 6 คน)
     layers[3] = [
         { id: "r3_1", name: "น.ต.อาทิตย์", title: "น.ทสส.บก.บน.2", phone: "-" },
-        { id: "r3_2", name: "ร.อ.หญิง วิภาดา", "title": "น.กำลังพล บก.บน.2", phone: "-" },
-        { id: "r3_3", name: "ร.ท.หญิง อารียา", "title": "สัสดี บก.บน.2", phone: "-" },
-        { id: "r3_4", name: "ร.ต.ศักดิ์รินทร์", "title": "น.กำลังพล", phone: "-" },
-        { id: "r3_5", name: "ว่าง", "title": "น.กำลังพล บก.บน.2", phone: "-" },
-        { id: "r3_6", name: "ว่าง", "title": "น.สัสดี บก.บน.2", phone: "-" }
+        { id: "r3_2", name: "ร.อ.หญิง วิภาดา", title: "น.กำลังพล บก.บน.2", phone: "-" },
+        { id: "r3_3", name: "ร.ท.หญิง อารียา", title: "สัสดี บก.บน.2", phone: "-" },
+        { id: "r3_4", name: "ร.ต.ศักดิ์รินทร์", title: "น.กำลังพล", phone: "-" },
+        { id: "r3_5", name: "ว่าง", title: "น.กำลังพล บก.บน.2", phone: "-" },
+        { id: "r3_6", name: "ว่าง", title: "น.สัสดี บก.บน.2", phone: "-" }
     ];
 
     // ชั้น 4: เจ้าหน้าที่ระดับกลาง (มี 5 คน)
     layers[4] = [
-        { id: "r4_1", name: "พ.อ.อ.วรนิตย์", "title": "จนท.กำลังพล", phone: "-" },
-        { id: "r4_2", name: "พ.อ.อ.หญิง พรพิมล", "title": "จนท.สัสดี", phone: "-" },
-        { id: "r4_3", name: "พ.อ.ต.ปรัชญา", "title": "จนท.กำลังพล", phone: "-" },
-        { id: "r4_4", name: "ว่าง", "title": "จนท.กำลังพล", phone: "-" },
-        { id: "r4_5", name: "ว่าง", "title": "จนท.กำลังพล", phone: "-" }
+        { id: "r4_1", name: "พ.อ.อ.วรนิตย์", title: "จนท.กำลังพล", phone: "-" },
+        { id: "r4_2", name: "พ.อ.อ.หญิง พรพิมล", title: "จนท.สัสดี", phone: "-" },
+        { id: "r4_3", name: "พ.อ.ต.ปรัชญา", title: "จนท.กำลังพล", phone: "-" },
+        { id: "r4_4", name: "ว่าง", title: "จนท.กำลังพล", phone: "-" },
+        { id: "r4_5", name: "ว่าง", title: "จนท.กำลังพล", phone: "-" }
     ];
 
     // ชั้น 5: เจ้าหน้าที่ระดับล่าง (มี 6 คน)
     layers[5] = [
-        { id: "r5_1", name: "จ.อ.อภิสิทธิ์", "title": "จนท.กำลังพล", phone: "-" },
-        { id: "r5_2", name: "ว่าง", "title": "จนท.กำลังพล", phone: "-" },
-        { id: "r5_3", name: "ว่าง", "title": "จนท.กำลังพล", phone: "-" },
-        { id: "r5_4", name: "ว่าง", "title": "จนท.กำลังพล", phone: "-" },
-        { id: "r5_5", name: "ว่าง", "title": "จนท.กำลังพล", phone: "-" },
-        { id: "r5_6", name: "ว่าง", "title": "จนท.สัสดี", phone: "-" }
+        { id: "r5_1", name: "จ.อ.อภิสิทธิ์", title: "จนท.กำลังพล", phone: "-" },
+        { id: "r5_2", name: "ว่าง", title: "จนท.กำลังพล", phone: "-" },
+        { id: "r5_3", name: "ว่าง", title: "จนท.กำลังพล", phone: "-" },
+        { id: "r5_4", name: "ว่าง", title: "จนท.กำลังพล", phone: "-" },
+        { id: "r5_5", name: "ว่าง", title: "จนท.กำลังพล", phone: "-" },
+        { id: "r5_6", name: "ว่าง", title: "จนท.สัสดี", phone: "-" }
     ];
 
-    // ชั้น 6: พนักงานราชการ (มี 5 คน)
+    // ชั้น 6: พนักงานราชการ (ฐานล่างสุดมี 5 คน)
     layers[6] = [
-        { id: "r6_1", name: "นางนิตยา", "title": "พนักงานธุรการ", phone: "-" },
-        { id: "r6_2", name: "น.ส.ศศิ", "title": "พนักงานธุรการ", phone: "-" },
-        { id: "r6_3", name: "นายระเบียบ", "title": "พนักงานธุรการ", phone: "-" },
-        { id: "r6_4", name: "น.ส.นิภาพร", "title": "พนักงานธุรการ", phone: "-" },
-        { id: "r6_5", name: "น.ส.หญิงชัญญา", "title": "พนักงานธุรการ", phone: "-" }
+        { id: "r6_1", name: "นางนิตยา", title: "พนักงานธุรการ", phone: "-" },
+        { id: "r6_2", name: "น.ส.ศศิ", title: "พนักงานธุรการ", phone: "-" },
+        { id: "r6_3", name: "นายระเบียบ", title: "พนักงานธุรการ", phone: "-" },
+        { id: "r6_4", name: "น.ส.นิภาพร", title: "พนักงานธุรการ", phone: "-" },
+        { id: "r6_5", name: "น.ส.หญิงชัญญา", title: "พนักงานธุรการ", phone: "-" }
     ];
 
     return Object.keys(layers).map(l => ({ layer: parseInt(l), people: layers[l] }));
