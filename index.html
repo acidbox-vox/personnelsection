@@ -13,13 +13,12 @@
     
     <style>
         :root {
-            --bg-color: #f8f9fa;
-            --card-bg: #ffffff;
-            --text-main: #343a40;
-            --text-sub: #6c757d;
-            --accent: #adb5bd;
-            --admin-red: #dc3545;
-            --save-green: #495057;
+            --bg-color: #f4f5f6;      /* สีพื้นหลังเทาอ่อนมากๆ */
+            --card-bg: #ffffff;       /* สีพื้นหลังการ์ดขาวสะอาด */
+            --text-main: #2b2d42;     /* สีฟอนต์เทาเข้มชาร์โคล */
+            --text-sub: #8d99ae;      /* สีฟอนต์เทาซอฟต์สำหรับตำแหน่ง */
+            --line-color: #d8dbdd;    /* สีเส้นเชื่อมโยงเทามินิมอล */
+            --modal-blur: rgba(244, 245, 246, 0.85);
         }
 
         body {
@@ -31,10 +30,11 @@
             display: flex;
             flex-direction: column;
             overflow-x: auto;
+            box-sizing: border-box;
         }
 
         header {
-            padding: 30px 0;
+            padding: 35px 0 15px 0;
             text-align: center;
         }
 
@@ -42,110 +42,122 @@
             font-weight: 500;
             letter-spacing: 1px;
             margin: 0;
-            font-size: 28px;
+            font-size: 24px;
             color: var(--text-main);
         }
 
-        /* Chart Container - จัดผังกึ่งกลาง */
+        /* Container ล็อกผังนิ่งและบังคับกึ่งกลางเสมอ */
         #chart-container {
             flex-grow: 1;
-            padding: 20px;
+            padding: 20px 40px;
             display: flex;
             justify-content: center;
             align-items: flex-start;
             min-width: max-content;
         }
 
-        /* ปรับแต่ง OrgChart ให้มินิมอล */
+        /* ปรับสไตล์ตัวผัง OrgChart ให้เป็นแนวเรียบแบนมินิมอล */
         .orgchart {
             background: transparent !important;
         }
 
-        /* ซ่อนเส้นเชื่อมโยงบางส่วนเพื่อให้ดูเป็นแถวลำดับชั้น (Row-based) */
-        .orgchart .lines .downLine { background-color: #dee2e6 !important; width: 1px !important; }
-        .orgchart .lines .topLine { border-top: 1px solid #dee2e6 !important; }
-        .orgchart .lines .leftLine { border-right: 1px solid #dee2e6 !important; }
-        .orgchart .lines .rightLine { border-left: 1px solid #dee2e6 !important; }
+        /* จัดการสไตล์เส้นเชื่อมโยงให้บางและเป็นสีเทาอ่อน */
+        .orgchart .lines .downLine { background-color: var(--line-color) !important; width: 1px !important; }
+        .orgchart .lines .topLine { border-top: 1px solid var(--line-color) !important; }
+        .orgchart .lines .leftLine { border-right: 1px solid var(--line-color) !important; }
+        .orgchart .lines .rightLine { border-left: 1px solid var(--line-color) !important; }
 
-        /* การ์ดบุคคลในผังหลัก */
+        /* การ์ดบุคคลในแต่ละแถว */
         .orgchart .node {
-            width: 160px !important;
-            border: 1px solid #e9ecef !important;
+            width: 165px !important;
+            border: 1px solid #e6e8ea !important;
             background-color: var(--card-bg) !important;
             border-radius: 8px !important;
-            padding-bottom: 5px !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
-            transition: all 0.3s ease !important;
+            padding: 5px 0 8px 0 !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.015) !important;
+            transition: all 0.25s ease-in-out !important;
         }
 
+        /* เอฟเฟกต์ยกตัวเล็กน้อยเมื่อ Hover โดยที่ผังไม่เลื่อนขยับ */
         .orgchart .node:hover {
             transform: translateY(-3px) !important;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;
-            background-color: #fff !important;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.04) !important;
+            border-color: #d1d5db !important;
         }
 
+        /* ซ่อนแถบสีหัวโหนดเดิมเพื่อให้ดูคลีนที่สุด */
         .orgchart .node .title {
             background-color: transparent !important;
             color: var(--text-sub) !important;
             font-size: 11px !important;
             font-weight: 400 !important;
-            text-transform: uppercase;
-            padding: 5px 0 !important;
+            padding: 4px 0 2px 0 !important;
         }
 
         .orgchart .node .content {
             border: none !important;
             color: var(--text-main) !important;
             font-weight: 500 !important;
-            font-size: 13px !important;
-            min-height: 25px !important;
+            font-size: 13.5px !important;
+            min-height: 22px !important;
+            padding: 0 5px !important;
         }
 
-        /* Admin UI */
+        /* แถบเครื่องมือจัดการแอดมินมุมขวาบน */
         #adminTools {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 25px;
+            right: 25px;
             display: none;
-            gap: 10px;
+            gap: 12px;
+            align-items: center;
             z-index: 1000;
         }
 
         #adminStatus {
-            background: #343a40;
+            background: #2b2d42;
             color: #fff;
-            padding: 8px 15px;
-            border-radius: 4px;
-            font-size: 13px;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
         }
 
         #logoutBtn {
-            background: white;
-            border: 1px solid #dee2e6;
-            padding: 8px 15px;
-            border-radius: 4px;
+            background: #ffffff;
+            color: #2b2d42;
+            border: 1px solid #e6e8ea;
+            padding: 6px 14px;
+            border-radius: 6px;
             cursor: pointer;
             font-family: inherit;
-            font-size: 13px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: background 0.2s;
         }
+        #logoutBtn:hover { background: #f4f5f6; }
 
+        /* ปุ่มเฟืองทางเข้าแอดมิน */
         #adminBtn {
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: #343a40;
+            background: #2b2d42;
             color: white;
             border: none;
-            width: 50px;
-            height: 50px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transition: all 0.3s;
+            font-size: 18px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            z-index: 999;
         }
+        #adminBtn:hover { transform: rotate(45deg); background: #1d1e2c; }
 
-        /* Modal & Zoom Animation */
+        /* หน้าต่าง Modal แบบกระจกฝ้าซูมการ์ดตรงกลาง */
         .modal {
             display: none;
             position: fixed;
@@ -154,68 +166,112 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(8px);
+            background: var(--modal-blur);
+            backdrop-filter: blur(10px);
         }
 
-        @keyframes cardZoom {
-            from { opacity: 0; transform: translate(-50%, -45%) scale(0.9); }
+        /* แอนิเมชันซูมเข้าเฉพาะส่วนเนื้อหาการ์ด Pop-up */
+        @keyframes minimalistZoom {
+            from { opacity: 0; transform: translate(-50%, -47%) scale(0.92); }
             to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
 
         .modal-content {
-            background: white;
-            width: 350px;
-            padding: 40px;
-            border-radius: 20px;
+            background: #ffffff;
+            width: 340px;
+            padding: 35px;
+            border-radius: 16px;
             text-align: center;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+            box-shadow: 0 30px 70px rgba(0,0,0,0.06);
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            animation: cardZoom 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+            animation: minimalistZoom 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            border: 1px solid #f0f2f4;
         }
 
         #personPhoto {
-            width: 110px;
-            height: 110px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             object-fit: cover;
-            margin-bottom: 20px;
-            background: #f1f3f5;
+            margin-bottom: 18px;
+            background: #f4f5f6;
+            border: 1px solid #e6e8ea;
         }
 
-        #personName { font-size: 20px; font-weight: 500; margin: 0; }
-        #personPosition { color: var(--text-sub); font-size: 14px; margin: 5px 0 20px 0; }
-        .phone-box { font-size: 14px; color: var(--text-main); background: #f8f9fa; padding: 10px; border-radius: 8px; }
+        #personName { font-size: 19px; font-weight: 500; margin: 0; color: var(--text-main); }
+        #personPosition { color: var(--text-sub); font-size: 13.5px; margin: 4px 0 20px 0; }
+        
+        .phone-container { 
+            font-size: 13.5px; 
+            color: var(--text-main); 
+            background: #f8f9fa; 
+            padding: 10px 0; 
+            border-radius: 8px;
+            border: 1px solid #f0f2f4;
+        }
 
-        .close { position: absolute; right: 25px; top: 20px; cursor: pointer; font-size: 24px; color: #adb5bd; }
+        .close { 
+            position: absolute; 
+            right: 22px; 
+            top: 18px; 
+            cursor: pointer; 
+            font-size: 22px; 
+            color: #adb5bd; 
+            transition: color 0.2s;
+        }
+        .close:hover { color: var(--text-main); }
 
-        /* Edit Form */
-        .edit-form { display: none; margin-top: 25px; text-align: left; border-top: 1px solid #f1f3f5; padding-top: 20px; }
-        .edit-form label { font-size: 11px; text-transform: uppercase; color: #adb5bd; display: block; margin-bottom: 5px; }
+        /* ส่วนฟอร์มสำหรับแอดมินแก้ไขข้อมูล */
+        .edit-form { 
+            display: none; 
+            margin-top: 25px; 
+            text-align: left; 
+            border-top: 1px solid #f0f2f4; 
+            padding-top: 20px; 
+        }
+        .edit-form label { 
+            font-size: 11px; 
+            font-weight: 500;
+            text-transform: uppercase; 
+            color: #94a3b8; 
+            display: block; 
+            margin-bottom: 5px; 
+            letter-spacing: 0.5px;
+        }
         .edit-form input {
             width: 100%;
-            padding: 10px;
+            padding: 9px 12px;
             margin-bottom: 15px;
-            border: 1px solid #e9ecef;
+            border: 1px solid #e2e8f0;
             border-radius: 6px;
             font-family: inherit;
+            font-size: 13px;
             box-sizing: border-box;
+            color: var(--text-main);
+            background-color: #fbfbfc;
+        }
+        .edit-form input:focus {
+            outline: none;
+            border-color: #cbd5e1;
         }
 
         .save-btn {
             width: 100%;
-            background: #343a40;
+            background: #2b2d42;
             color: white;
             border: none;
-            padding: 12px;
+            padding: 11px;
             border-radius: 6px;
             cursor: pointer;
             font-family: inherit;
             font-weight: 500;
+            font-size: 14px;
+            transition: background 0.2s;
         }
+        .save-btn:hover { background: #1d1e2c; }
     </style>
 </head>
 <body>
@@ -236,19 +292,19 @@
     <div id="detailModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <img id="personPhoto" src="" alt="Photo">
+            <img id="personPhoto" src="" alt="Profile">
             <h2 id="personName"></h2>
             <p id="personPosition"></p>
-            <div class="phone-box">📞 <span id="personPhone"></span></div>
+            <div class="phone-container">📞 เบอร์โทรศัพท์: <span id="personPhone"></span></div>
 
             <div id="adminEditForm" class="edit-form">
-                <label>Name</label>
+                <label>ชื่อ - นามสกุล</label>
                 <input type="text" id="inputName">
-                <label>Position</label>
+                <label>ตำแหน่ง</label>
                 <input type="text" id="inputPosition">
-                <label>Phone</label>
+                <label>เบอร์โทรศัพท์</label>
                 <input type="text" id="inputPhone">
-                <label>Photo URL</label>
+                <label>ที่อยู่ลิงก์รูปภาพ (URL)</label>
                 <input type="text" id="inputPhoto">
                 <button class="save-btn" id="saveChangeBtn">SAVE CHANGES</button>
             </div>
@@ -264,42 +320,42 @@
         let selectedNodeId = null;
         let currentChartData = null;
 
-        // 1. ข้อมูลโครงสร้างแบบลำดับชั้น (Rows)
+        // 1. โครงสร้าง JSON แถวปิรามิดกึ่งกลางสมบูรณ์แบบเรียงลำดับชั้นทีละระดับ (ไร้การผูกเส้นเยื้องสายตรง)
         const initialData = {
-            "id": "l1_1", "name": "หัวหน้า", "title": "LEVEL 1", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+            "id": "row1_1", "name": "หัวหน้า", "title": "หัวหน้าแผนก", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
             "children": [
                 {
-                    "id": "l2_1", "name": "รองหัวหน้า", "title": "LEVEL 2", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+                    "id": "row2_1", "name": "รองหัวหน้า", "title": "รองหัวหน้าแผนก", "phone": "-", "photo": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
                     "children": [
-                        // LEVEL 3: 4 กำลังพล + 2 สัสดี
-                        {"id": "l3_1", "name": "นายทหารกำลังพล 1", "title": "LEVEL 3", "phone": "-", "photo": ""},
-                        {"id": "l3_2", "name": "นายทหารกำลังพล 2", "title": "LEVEL 3", "phone": "-", "photo": ""},
-                        {"id": "l3_3", "name": "นายทหารกำลังพล 3", "title": "LEVEL 3", "phone": "-", "photo": ""},
-                        {"id": "l3_4", "name": "นายทหารกำลังพล 4", "title": "LEVEL 3", "phone": "-", "photo": ""},
-                        {"id": "l3_5", "name": "นายทหารสัสดี 1", "title": "LEVEL 3", "phone": "-", "photo": ""},
-                        {"id": "l3_6", "name": "นายทหารสัสดี 2", "title": "LEVEL 3", "phone": "-", "photo": "",
+                        // แถวชั้นที่ 3: นายทหารกำลังพล 4 นาย + นายทหารสัสดี 2 นาย (รวม 6 คนในระนาบเดียวกันกึ่งกลางเป๊ะ)
+                        {"id": "row3_1", "name": "นายทหารกำลังพล 1", "title": "นายทหารกำลังพล", "phone": "-", "photo": ""},
+                        {"id": "row3_2", "name": "นายทหารกำลังพล 2", "title": "นายทหารกำลังพล", "phone": "-", "photo": ""},
+                        {"id": "row3_3", "name": "นายทหารกำลังพล 3", "title": "นายทหารกำลังพล", "phone": "-", "photo": ""},
+                        {"id": "row3_4", "name": "นายทหารกำลังพล 4", "title": "นายทหารกำลังพล", "phone": "-", "photo": ""},
+                        {"id": "row3_5", "name": "นายทหารสัสดี 1", "title": "นายทหารสัสดี", "phone": "-", "photo": ""},
+                        {"id": "row3_6", "name": "นายทหารสัสดี 2", "title": "นายทหารสัสดี", "phone": "-", "photo": "",
                             "children": [
-                                // LEVEL 4: จนท.กำลังพล 5
-                                {"id": "l4_1", "name": "จนท.กำลังพล 1", "title": "LEVEL 4", "phone": "-"},
-                                {"id": "l4_2", "name": "จนท.กำลังพล 2", "title": "LEVEL 4", "phone": "-"},
-                                {"id": "l4_3", "name": "จนท.กำลังพล 3", "title": "LEVEL 4", "phone": "-"},
-                                {"id": "l4_4", "name": "จนท.กำลังพล 4", "title": "LEVEL 4", "phone": "-"},
-                                {"id": "l4_5", "name": "จนท.กำลังพล 5", "title": "LEVEL 4", "phone": "-",
+                                // แถวชั้นที่ 4: จนท.กำลังพล 5 นาย (รวม 5 คน แตกกิ่งสมมาตรกึ่งกลาง)
+                                {"id": "row4_1", "name": "จนท.กำลังพล 1", "title": "จนท.กำลังพล", "phone": "-"},
+                                {"id": "row4_2", "name": "จนท.กำลังพล 2", "title": "จนท.กำลังพล", "phone": "-"},
+                                {"id": "row4_3", "name": "จนท.กำลังพล 3", "title": "จนท.กำลังพล", "phone": "-"},
+                                {"id": "row4_4", "name": "จนท.กำลังพล 4", "title": "จนท.กำลังพล", "phone": "-"},
+                                {"id": "row4_5", "name": "จนท.กำลังพล 5", "title": "จนท.กำลังพล", "phone": "-",
                                     "children": [
-                                        // LEVEL 5: จนท.กำลังพลน้อย 5 + จนท.สัสดี 1
-                                        {"id": "l5_1", "name": "จนท.กำลังพลน้อย 1", "title": "LEVEL 5", "phone": "-"},
-                                        {"id": "l5_2", "name": "จนท.กำลังพลน้อย 2", "title": "LEVEL 5", "phone": "-"},
-                                        {"id": "l5_3", "name": "จนท.กำลังพลน้อย 3", "title": "LEVEL 5", "phone": "-"},
-                                        {"id": "l5_4", "name": "จนท.กำลังพลน้อย 4", "title": "LEVEL 5", "phone": "-"},
-                                        {"id": "l5_5", "name": "จนท.กำลังพลน้อย 5", "title": "LEVEL 5", "phone": "-"},
-                                        {"id": "l5_6", "name": "จนท.สัสดี 1", "title": "LEVEL 5", "phone": "-",
+                                        // แถวชั้นที่ 5: จนท.กำลังพลน้อย 5 นาย + จนท.สัสดี 1 นาย (รวม 6 คนในระนาบเดียวกันกึ่งกลาง)
+                                        {"id": "row5_1", "name": "จนท.กำลังพลน้อย 1", "title": "จนท.กำลังพลน้อย", "phone": "-"},
+                                        {"id": "row5_2", "name": "จนท.กำลังพลน้อย 2", "title": "จนท.กำลังพลน้อย", "phone": "-"},
+                                        {"id": "row5_3", "name": "จนท.กำลังพลน้อย 3", "title": "จนท.กำลังพลน้อย", "phone": "-"},
+                                        {"id": "row5_4", "name": "จนท.กำลังพลน้อย 4", "title": "จนท.กำลังพลน้อย", "phone": "-"},
+                                        {"id": "row5_5", "name": "จนท.กำลังพลน้อย 5", "title": "จนท.กำลังพลน้อย", "phone": "-"},
+                                        {"id": "row5_6", "name": "จนท.สัสดี 1", "title": "จนท.สัสดี", "phone": "-",
                                             "children": [
-                                                // LEVEL 6: พนักงานราชการ 5
-                                                {"id": "l6_1", "name": "พนักงานราชการ 1", "title": "LEVEL 6", "phone": "-"},
-                                                {"id": "l6_2", "name": "พนักงานราชการ 2", "title": "LEVEL 6", "phone": "-"},
-                                                {"id": "l6_3", "name": "พนักงานราชการ 3", "title": "LEVEL 6", "phone": "-"},
-                                                {"id": "l6_4", "name": "พนักงานราชการ 4", "title": "LEVEL 6", "phone": "-"},
-                                                {"id": "l6_5", "name": "พนักงานราชการ 5", "title": "LEVEL 6", "phone": "-"}
+                                                // แถวชั้นที่ 6: พนักงานราชการ 5 นาย (ล่างสุด แตกกิ่งกึ่งกลางสมบูรณ์)
+                                                {"id": "row6_1", "name": "พนักงานราชการ 1", "title": "พนักงานราชการ", "phone": "-"},
+                                                {"id": "row6_2", "name": "พนักงานราชการ 2", "title": "พนักงานราชการ", "phone": "-"},
+                                                {"id": "row6_3", "name": "พนักงานราชการ 3", "title": "พนักงานราชการ", "phone": "-"},
+                                                {"id": "row6_4", "name": "พนักงานราชการ 4", "title": "พนักงานราชการ", "phone": "-"},
+                                                {"id": "row6_5", "name": "พนักงานราชการ 5", "title": "พนักงานราชการ", "phone": "-"}
                                             ]
                                         }
                                     ]
@@ -311,22 +367,23 @@
             ]
         };
 
+        // 2. ฟังก์ชันเริ่มโหลดผังองค์กรล็อกมุมมองนิ่งสนิท
         function renderChart() {
-            const savedData = localStorage.getItem("minimal_military_chart");
+            const savedData = localStorage.getItem("minimal_pyramid_chart");
             currentChartData = savedData ? JSON.parse(savedData) : initialData;
 
             $('#chart-container').html('');
             $('#chart-container').orgchart({
                 'data': currentChartData,
                 'nodeContent': 'title',
-                'pan': false,
-                'zoom': false
+                'pan': false,       /* ปิดการลากขยับตัวผังใหญ่ */
+                'zoom': false       /* ปิดการสกรอลล์ซูมผังใหญ่ */
             });
 
             if(localStorage.getItem("admin_logged_in") === "true") activateAdmin();
         }
 
-        // คลิกเปิดการ์ด (Zoom in)
+        // 3. ระบบคลิกแสดงรายละเอียดเพื่อสเกลซูมเฉพาะการ์ดป๊อปอัปเด้งขึ้นมา
         $(document).on('click', '.node', function(e){
             e.stopPropagation();
             const data = $(this).data('nodeData');
@@ -353,12 +410,15 @@
             if(e.target == this) $('#detailModal').fadeOut(200);
         });
 
-        // Admin Auth
+        // 4. เข้าสู่ระบบผู้ดูแลระบบ
         $('#adminBtn').click(function() {
-            const p = prompt("ENTER ADMIN PASSWORD:");
+            const p = prompt("กรุณากรอกรหัสผ่านแอดมินเพื่อเปิดระบบแก้ไข:");
             if(p === ADMIN_PASSWORD) {
                 localStorage.setItem("admin_logged_in", "true");
                 activateAdmin();
+                alert("เข้าสู่โหมดแอดมินสำเร็จ!");
+            } else if(p !== null) {
+                alert("รหัสผ่านไม่ถูกต้อง!");
             }
         });
 
@@ -373,7 +433,7 @@
             location.reload();
         });
 
-        // Update Logic
+        // 5. ลูปอัปเดตค่าลงใน JSON
         function findAndUpdate(data, id, n, t, ph, pic) {
             if(data.id === id) {
                 data.name = n; data.title = t; data.phone = ph; data.photo = pic;
@@ -387,10 +447,11 @@
             return false;
         }
 
+        // 6. กดบันทึกข้อมูลถาวร
         $('#saveChangeBtn').click(function() {
             findAndUpdate(currentChartData, selectedNodeId, $('#inputName').val(), $('#inputPosition').val(), $('#inputPhone').val(), $('#inputPhoto').val());
-            localStorage.setItem("minimal_military_chart", JSON.stringify(currentChartData));
-            alert("SAVED");
+            localStorage.setItem("minimal_pyramid_chart", JSON.stringify(currentChartData));
+            alert("บันทึกข้อมูลเรียบร้อยแล้ว");
             location.reload();
         });
 
