@@ -2,32 +2,385 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>ผังองค์กร</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ผังองค์กรกำลังพลและสัสดี</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/orgchart/3.8.0/css/jquery.orgchart.min.css">
-    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        body {
+            font-family: 'Chakra Petch', sans-serif, Arial;
+            background: #f4f6f9;
+            padding: 20px;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+
+        /* แอนิเมชัน ค่อยๆ ขยายผังองค์กรออกมาตอนโหลดหน้าเว็บ */
+        @keyframes expandIn {
+            from {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        #chart-container {
+            overflow: auto;
+            height: 80vh;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            /* เรียกใช้แอนิเมชันขยายออก */
+            animation: expandIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        /* ตกแต่งหน้าตาของโหนด (กล่องข้อความ) */
+        .orgchart .node {
+            width: 150px !important;
+            transition: all 0.3s ease;
+        }
+        .orgchart .node:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        /* สไตล์ปุ่มเฟืองแอดมิน */
+        #adminBtn {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            font-size: 30px;
+            cursor: pointer;
+            background: #1f2937;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,.3);
+            z-index: 9999;
+            transition: all 0.3s;
+        }
+        #adminBtn:hover {
+            transform: rotate(90deg) scale(1.1);
+            background: #374151;
+        }
+
+        /* แถบแจ้งเตือนสถานะแอดมิน */
+        #adminBadge {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ef4444;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 999;
+        }
+
+        /* สไตล์ Modal (ป๊อปอัปแสดงผล/แก้ไข) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,.5);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: white;
+            width: 360px;
+            margin: 10% auto;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        #personPhoto {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #f3f4f6;
+            margin-bottom: 15px;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            cursor: pointer;
+            font-size: 28px;
+            color: #9ca3af;
+        }
+        .close:hover { color: #111827; }
+
+        /* ฟอร์มอินพุตสำหรับโหมดแก้ไขของแอดมิน */
+        .edit-form {
+            display: none;
+            margin-top: 15px;
+            text-align: left;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 15px;
+        }
+        .edit-form label {
+            font-size: 13px;
+            color: #6b7280;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .edit-form input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        .save-btn {
+            width: 100%;
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .save-btn:hover { background: #059669; }
+    </style>
 </head>
 <body>
 
-    <h1>ผังองค์กรกำลังพล</h1>
-
+    <h1>ผังองค์กรกำลังพลและสายงานสัสดี</h1>
+    
+    <div id="adminBadge">🔴 โหมดแอดมิน (คลิกที่กล่องเพื่อแก้ไข)</div>
     <div id="chart-container"></div>
+
+    <button id="adminBtn" title="เข้าสู่ระบบแอดมิน">⚙️</button>
 
     <div id="detailModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <img id="personPhoto">
-            <h2 id="personName"></h2>
-            <p id="personPosition"></p>
-            <p id="personPhone"></p>
-            <p id="personEmail"></p>
+            
+            <img id="personPhoto" src="" alt="รูปภาพประจำตัว">
+            <h2 id="personName" style="margin:5px 0;"></h2>
+            <p id="personPosition" style="color:#6b7280; margin:5px 0; font-weight:bold;"></p>
+
+            <div id="adminEditForm" class="edit-form">
+                <label>แก้ไขชื่อ-นามสกุล:</label>
+                <input type="text" id="inputName">
+                
+                <label>แก้ไขชื่อตำแหน่ง:</label>
+                <input type="text" id="inputPosition">
+                
+                <label>ลิงก์ที่อยู่รูปภาพ (URL หรือโฟลเดอร์ เช่น photos/name.jpg):</label>
+                <input type="text" id="inputPhoto">
+                
+                <button class="save-btn" id="saveChangeBtn">💾 บันทึกการเปลี่ยนแปลง</button>
+            </div>
         </div>
     </div>
 
-    <button id="adminBtn">⚙️</button>
-
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/orgchart/3.8.0/js/jquery.orgchart.min.js"></script>
-    <script src="script.js"></script>
 
+    <script>
+        const ADMIN_PASSWORD = "0910655667";
+        let isAdmin = false;
+        let selectedNodeId = null; // เก็บไอดีของคนที่จะแก้ไข
+        let currentChartData = null; // เก็บข้อมูลผังทั้งหมด
+
+        // 1. โครงสร้างข้อมูลตั้งต้นตรงตามลำดับที่คุณกำหนด (รวม 24 คน)
+        const defaultData = {
+            "id": "node_1", "name": "หัวหน้า 1", "title": "หัวหน้าแผนก", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+            "children": [
+                {
+                    "id": "node_2", "name": "รองหัวหน้า 1", "title": "รองหัวหน้าแผนก", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                    "children": [
+                        // สายงานนายทหารกำลังพล (4 คน)
+                        {
+                            "id": "node_3", "name": "นายทหารกำลังพล 1", "title": "นายทหารกำลังพล", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                            "children": [
+                                {
+                                    "id": "node_7", "name": "เจ้าหน้าที่กำลังพล 1", "title": "เจ้าหน้าที่กำลังพล", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                                    "children": [
+                                        {"id": "node_12", "name": "เจ้าหน้าที่กำลังพลน้อย 1", "title": "เจ้าหน้าที่กำลังพลน้อย", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png", "children": [
+                                            {"id": "node_16", "name": "พนักงานราชการ 1", "title": "พนักงานราชการ", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"},
+                                            {"id": "node_17", "name": "พนักงานราชการ 2", "title": "พนักงานราชการ", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                                        ]}
+                                    ]
+                                },
+                                {"id": "node_8", "name": "เจ้าหน้าที่กำลังพล 2", "title": "เจ้าหน้าที่กำลังพล", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                            ]
+                        },
+                        {
+                            "id": "node_4", "name": "นายทหารกำลังพล 2", "title": "นายทหารกำลังพล", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                            "children": [
+                                {"id": "node_9", "name": "เจ้าหน้าที่กำลังพล 3", "title": "เจ้าหน้าที่กำลังพล", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                            ]
+                        },
+                        {
+                            "id": "node_5", "name": "นายทหารกำลังพล 3", "title": "นายทหารกำลังพล", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                            "children": [
+                                {"id": "node_10", "name": "เจ้าหน้าที่กำลังพล 4", "title": "เจ้าหน้าที่กำลังพล", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png", "children": [
+                                    {"id": "node_13", "name": "เจ้าหน้าที่กำลังพลน้อย 2", "title": "เจ้าหน้าที่กำลังพลน้อย", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png", "children": [
+                                        {"id": "node_18", "name": "พนักงานราชการ 3", "title": "พนักงานราชการ", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                                    ]}
+                                ]}
+                            ]
+                        },
+                        {
+                            "id": "node_6", "name": "นายทหารกำลังพล 4", "title": "นายทหารกำลังพล", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                            "children": [
+                                {"id": "node_11", "name": "เจ้าหน้าที่กำลังพล 5", "title": "เจ้าหน้าที่กำลังพล", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png", "children": [
+                                    {"id": "node_14", "name": "เจ้าหน้าที่กำลังพลน้อย 3", "title": "เจ้าหน้าที่กำลังพลน้อย", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png", "children": [
+                                        {"id": "node_19", "name": "พนักงานราชการ 4", "title": "พนักงานราชการ", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                                    ]}
+                                ]}
+                            ]
+                        },
+                        
+                        // สายงานนายทหารสัสดี (2 คน)
+                        {
+                            "id": "s_node_1", "name": "นายทหารสัสดี 1", "title": "นายทหารสัสดี", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                            "children": [
+                                {"id": "s_node_3", "name": "เจ้าหน้าที่สัสดี 1", "title": "เจ้าหน้าที่สัสดี", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png", "children": [
+                                    {"id": "node_15", "name": "เจ้าหน้าที่กำลังพลน้อย 4", "title": "เจ้าหน้าที่กำลังพลน้อย", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png", "children": [
+                                        {"id": "node_20", "name": "พนักงานราชการ 5", "title": "พนักงานราชการ", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                                    ]}
+                                ]}
+                            ]
+                        },
+                        {
+                            "id": "s_node_2", "name": "นายทหารสัสดี 2", "title": "นายทหารสัสดี", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png",
+                            "children": [
+                                {"id": "s_node_4", "name": "เจ้าหน้าที่สัสดี 2", "title": "เจ้าหน้าที่สัสดี", "photo": "https://cdn-icons-png.flaticon.com/512/1869/1869679.png"}
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // 2. ฟังก์ชันเริ่มโหลดแผนภูมิองค์กร
+        function renderChart() {
+            // เช็คว่ามีข้อมูลที่บันทึกไว้ในคอมเครื่องนี้ไหม ถ้าไม่มีให้ใช้ข้อมูลตั้งต้นด้านบน
+            const savedData = localStorage.getItem("military_chart_db");
+            currentChartData = savedData ? JSON.parse(savedData) : defaultData;
+
+            // ล้างหน้าจอแล้ววาดใหม่
+            $('#chart-container').html('');
+            $('#chart-container').orgchart({
+                'data': currentChartData,
+                'pan': true,
+                'zoom': true,
+                'nodeContent': 'title'
+            });
+        }
+
+        // 3. ระบบคลิกกล่องรายบุคคล (Event Delegation)
+        $(document).on('click', '.node', function(){
+            let nodeData = $(this).data('nodeData');
+            selectedNodeId = nodeData.id;
+
+            // นำข้อมูลเดิมไปแสดงบนกล่องป๊อปอัป
+            document.getElementById("personName").innerText = nodeData.name || '';
+            document.getElementById("personPosition").innerText = nodeData.title || '';
+            document.getElementById("personPhoto").src = nodeData.photo || 'https://cdn-icons-png.flaticon.com/512/1869/1869679.png';
+
+            // ถ้าล็อกอินแอดมินอยู่ ให้เปิดฟอร์มแก้ไขและใส่ค่าปัจจุบันลงในช่องกรอก
+            if (isAdmin) {
+                document.getElementById("adminEditForm").style.display = "block";
+                document.getElementById("inputName").value = nodeData.name || '';
+                document.getElementById("inputPosition").value = nodeData.title || '';
+                document.getElementById("inputPhoto").value = nodeData.photo || '';
+            } else {
+                document.getElementById("adminEditForm").style.display = "none";
+            }
+
+            document.getElementById("detailModal").style.display = "block";
+        });
+
+        // ปุ่มปิดป๊อปอัป
+        document.querySelector(".close").onclick = () => {
+            document.getElementById("detailModal").style.display = "none";
+        };
+
+        // 4. ระบบการเช็คและเข้าสู่โหมดแอดมินเมื่อกดปุ่มเฟือง
+        document.getElementById("adminBtn").addEventListener("click", () => {
+            const pass = prompt("กรุณากรอกรหัสผ่านแอดมินเพื่อแก้ไขผัง:");
+            
+            if (pass === ADMIN_PASSWORD) {
+                isAdmin = true;
+                document.body.classList.add("admin-mode");
+                document.getElementById("adminBadge").style.display = "block";
+                alert("เข้าสู่โหมดผู้ดูแลระบบสำเร็จ! (ท่านสามารถคลิกที่ชื่อคนใดก็ได้ในผังเพื่อแก้ไขข้อมูลภาพและชื่อได้ทันที)");
+            } else if (pass !== null) {
+                alert("รหัสผ่านไม่ถูกต้อง! ไม่สามารถแก้ไขได้");
+            }
+        });
+
+        // 5. ฟังก์ชันค้นหาและอัปเดตข้อมูลย้อนกลับเข้าไปในโครงสร้าง JSON
+        function updateNodeInJSON(targetData, idToFind, newName, newTitle, newPhoto) {
+            if (targetData.id === idToFind) {
+                targetData.name = newName;
+                targetData.title = newTitle;
+                targetData.photo = newPhoto;
+                return true;
+            }
+            if (targetData.children) {
+                for (let i = 0; i < targetData.children.length; i++) {
+                    let found = updateNodeInJSON(targetData.children[i], idToFind, newName, newTitle, newPhoto);
+                    if (found) return true;
+                }
+            }
+            return false;
+        }
+
+        // 6. กดบันทึกการแก้ไขข้อมูลบุคคล
+        document.getElementById("saveChangeBtn").addEventListener("click", () => {
+            if (!isAdmin || !selectedNodeId) return;
+
+            const newName = document.getElementById("inputName").value;
+            const newTitle = document.getElementById("inputPosition").value;
+            const newPhoto = document.getElementById("inputPhoto").value;
+
+            // ค้นหาและแก้ไขในกิ่งตัวแปร
+            updateNodeInJSON(currentChartData, selectedNodeId, newName, newTitle, newPhoto);
+
+            // เซฟลงเครื่อง (Local Storage)
+            localStorage.setItem("military_chart_db", JSON.stringify(currentChartData));
+
+            alert("บันทึกข้อมูลเรียบร้อยแล้ว!");
+            document.getElementById("detailModal").style.display = "none";
+            
+            // สั่งโหลดวาดผังใหม่แบบทันทีบนหน้าจอ
+            renderChart();
+        });
+
+        // สั่งเปิดระบบตอนโหลดหน้าเว็บ
+        document.addEventListener("DOMContentLoaded", renderChart);
+    </script>
 </body>
 </html>
