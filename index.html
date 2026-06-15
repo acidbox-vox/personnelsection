@@ -83,8 +83,8 @@
             border-color: #d1d5db !important;
         }
 
-        /* เทคนิคซ่อนโหนดเชื่อมต่อ (ทำให้ผังทิ้งดิ่งตรงกลางสมมาตรปิรามิด) */
-        .orgchart .node.invisible-connector {
+        /* เทคนิคซ่อนกล่องแกนกลาง (ลำต้นต้นคริสต์มาส) เพื่อความสมบูรณ์แบบของทรงปิรามิด */
+        .orgchart .node.tree-trunk {
             visibility: hidden !important;
             opacity: 0 !important;
             height: 0px !important;
@@ -295,64 +295,73 @@
         let selectedNodeId = null;
         let currentChartData = null;
 
-        // โครงสร้างปิรามิดสมมาตรหน้ากระดาน 100% โดยใช้ Invisible Connector บังคับทิศทางตรงกึ่งกลาง
+        // โครงสร้างแบบแกนกลางต้นคริสต์มาส (Center Trunk) มุ่งตรงลงมาและแตกกิ่งสมดุลซ้ายขวาอย่างเท่าเทียม
         const initialData = {
             "id": "r1_head", "name": "หัวหน้า", "title": "หัวหน้า", "phone": "-", "photo": "",
             "children": [
                 {
                     "id": "r2_deputy", "name": "รองหัวหน้า", "title": "รองหัวหน้า", "phone": "-", "photo": "",
                     "children": [
-                        // แถวที่ 3: นายทหารกำลังพล 4 นาย และ นายทหารสัสดี 2 นาย (รวม 6 คน เรียงหน้ากระดานกึ่งกลาง)
-                        {"id": "r3_kp1", "name": "นายทหารกำลังพล 1", "title": "นายทหารกำลังพล", "phone": "-"},
-                        {"id": "r3_kp2", "name": "นายทหารกำลังพล 2", "title": "นายทหารกำลังพล", "phone": "-"},
+                        // แกนลำต้นชั้นที่ 1 (ซ่อนอยู่ตรงกึ่งกลางของแถวที่ 3)
                         {
-                            // ตัวเชื่อมล่องหนตัวที่ 1 (ดิ่งลงมาจากจุดกึ่งกลางแถวที่ 3)
-                            "id": "conn_1", "className": "invisible-connector", "name": "conn", "title": "conn",
+                            "id": "trunk_layer3", "className": "tree-trunk", "name": "trunk", "title": "trunk",
                             "children": [
-                                // แถวที่ 4: จนท.กำลังพล 5 นาย (เรียงหน้ากระดานกึ่งกลางสมดุล)
-                                {"id": "r4_kp1", "name": "จนท.กำลังพล 1", "title": "จนท.กำลังพล", "phone": "-"},
-                                {"id": "r4_kp2", "name": "จนท.กำลังพล 2", "title": "จนท.กำลังพล", "phone": "-"},
+                                // แถวที่ 3: กระจายตัวออกซ้าย-ขวาเท่าๆ กัน (ฝั่งละ 3 คน รวมเป็น 6 คน)
+                                {"id": "r3_kp1", "name": "นายทหารกำลังพล 1", "title": "นายทหารกำลังพล", "phone": "-"},
+                                {"id": "r3_kp2", "name": "นายทหารกำลังพล 2", "title": "นายทหารกำลังพล", "phone": "-"},
+                                {"id": "r3_kp3", "name": "นายทหารกำลังพล 3", "title": "นายทหารกำลังพล", "phone": "-"},
+                                
+                                // แกนลำต้นชั้นที่ 2 (ทิ้งดิ่งลงมาจากแกนกลางแถวที่ 3 สู่แถวที่ 4)
                                 {
-                                    // ตัวเชื่อมล่องหนตัวที่ 2 (ดิ่งลงมาจากจุดกึ่งกลางแถวที่ 4)
-                                    "id": "conn_2", "className": "invisible-connector", "name": "conn", "title": "conn",
+                                    "id": "trunk_layer4", "className": "tree-trunk", "name": "trunk", "title": "trunk",
                                     "children": [
-                                        // แถวที่ 5: จนท.กำลังพลน้อย 5 นาย และ จนท.สัสดี 1 นาย (รวม 6 คน เรียงหน้ากระดานกึ่งกลาง)
-                                        {"id": "r5_kpn1", "name": "จนท.กำลังพลน้อย 1", "title": "จนท.กำลังพลน้อย", "phone": "-"},
-                                        {"id": "r5_kpn2", "name": "จนท.กำลังพลน้อย 2", "title": "จนท.กำลังพลน้อย", "phone": "-"},
-                                        {"id": "r5_kpn3", "name": "จนท.กำลังพลน้อย 3", "title": "จนท.กำลังพลน้อย", "phone": "-"},
+                                        // แถวที่ 4: จนท.กำลังพล 5 นาย (จัดสมดุลซ้าย-ขวาล้อมรอบแกนกลาง)
+                                        {"id": "r4_kp1", "name": "จนท.กำลังพล 1", "title": "จนท.กำลังพล", "phone": "-"},
+                                        {"id": "r4_kp2", "name": "จนท.กำลังพล 2", "title": "จนท.กำลังพล", "phone": "-"},
+                                        
+                                        // แกนลำต้นชั้นที่ 3 (ทิ้งดิ่งจากกึ่งกลางแถวที่ 4 สู่แถวที่ 5)
                                         {
-                                            // ตัวเชื่อมล่องหนตัวที่ 3 (ดิ่งลงมาจากจุดกึ่งกลางแถวที่ 5)
-                                            "id": "conn_3", "className": "invisible-connector", "name": "conn", "title": "conn",
+                                            "id": "trunk_layer5", "className": "tree-trunk", "name": "trunk", "title": "trunk",
                                             "children": [
-                                                // แถวที่ 6: พนักงานราชการ 5 นาย (ล่างสุด เรียงหน้ากระดานกึ่งกลางสมบูรณ์)
-                                                {"id": "r6_pw1", "name": "พนักงานราชการ 1", "title": "พนักงานราชการ", "phone": "-"},
-                                                {"id": "r6_pw2", "name": "พนักงานราชการ 2", "title": "พนักงานราชการ", "phone": "-"},
-                                                {"id": "r6_pw3", "name": "พนักงานราชการ 3", "title": "พนักงานราชการ", "phone": "-"},
-                                                {"id": "r6_pw4", "name": "พนักงานราชการ 4", "title": "พนักงานราชการ", "phone": "-"},
-                                                {"id": "r6_pw5", "name": "พนักงานราชการ 5", "title": "พนักงานราชการ", "phone": "-"}
+                                                // แถวที่ 5: จนท.กำลังพลน้อย 5 นาย + จนท.สัสดี 1 นาย (ฝั่งละ 3 คน รวมเป็น 6 คน)
+                                                {"id": "r5_kpn1", "name": "จนท.กำลังพลน้อย 1", "title": "จนท.กำลังพลน้อย", "phone": "-"},
+                                                {"id": "r5_kpn2", "name": "จนท.กำลังพลน้อย 2", "title": "จนท.กำลังพลน้อย", "phone": "-"},
+                                                {"id": "r5_kpn3", "name": "จนท.กำลังพลน้อย 3", "title": "จนท.กำลังพลน้อย", "phone": "-"},
+                                                
+                                                // แกนลำต้นชั้นที่ 4 (ทิ้งดิ่งจากกึ่งกลางแถวที่ 5 สู่แถวที่ 6 ล่างสุด)
+                                                {
+                                                    "id": "trunk_layer6", "className": "tree-trunk", "name": "trunk", "title": "trunk",
+                                                    "children": [
+                                                        // แถวที่ 6: พนักงานราชการ 5 นาย (ฐานล่างสุดของต้นคริสต์มาส)
+                                                        {"id": "r6_pw1", "name": "พนักงานราชการ 1", "title": "พนักงานราชการ", "phone": "-"},
+                                                        {"id": "r6_pw2", "name": "พนักงานราชการ 2", "title": "พนักงานราชการ", "phone": "-"},
+                                                        {"id": "r6_pw3", "name": "พนักงานราชการ 3", "title": "พนักงานราชการ", "phone": "-"},
+                                                        {"id": "r6_pw4", "name": "พนักงานราชการ 4", "title": "พนักงานราชการ", "phone": "-"},
+                                                        {"id": "r6_pw5", "name": "พนักงานราชการ 5", "title": "พนักงานราชการ", "phone": "-"}
+                                                    ]
+                                                },
+                                                {"id": "r5_kpn4", "name": "จนท.กำลังพลน้อย 4", "title": "จนท.กำลังพลน้อย", "phone": "-"},
+                                                {"id": "r5_kpn5", "name": "จนท.กำลังพลน้อย 5", "title": "จนท.กำลังพลน้อย", "phone": "-"},
+                                                {"id": "r5_ss1", "name": "จนท.สัสดี 1", "title": "จนท.สัสดี", "phone": "-"}
                                             ]
                                         },
-                                        {"id": "r5_kpn4", "name": "จนท.กำลังพลน้อย 4", "title": "จนท.กำลังพลน้อย", "phone": "-"},
-                                        {"id": "r5_kpn5", "name": "จนท.กำลังพลน้อย 5", "title": "จนท.กำลังพลน้อย", "phone": "-"},
-                                        {"id": "r5_ss1", "name": "จนท.สัสดี 1", "title": "จนท.สัสดี", "phone": "-"}
+                                        {"id": "r4_kp3", "name": "จนท.กำลังพล 3", "title": "จนท.กำลังพล", "phone": "-"},
+                                        {"id": "r4_kp4", "name": "จนท.กำลังพล 4", "title": "จนท.กำลังพล", "phone": "-"},
+                                        {"id": "r4_kp5", "name": "จนท.กำลังพล 5", "title": "จนท.กำลังพล", "phone": "-"}
                                     ]
                                 },
-                                {"id": "r4_kp3", "name": "จนท.กำลังพล 3", "title": "จนท.กำลังพล", "phone": "-"},
-                                {"id": "r4_kp4", "name": "จนท.กำลังพล 4", "title": "จนท.กำลังพล", "phone": "-"},
-                                {"id": "r4_kp5", "name": "จนท.กำลังพล 5", "title": "จนท.กำลังพล", "phone": "-"}
+                                {"id": "r3_kp4", "name": "นายทหารกำลังพล 4", "title": "นายทหารกำลังพล", "phone": "-"},
+                                {"id": "r3_ss1", "name": "นายทหารสัสดี 1", "title": "นายทหารสัสดี", "phone": "-"},
+                                {"id": "r3_ss2", "name": "นายทหารสัสดี 2", "title": "นายทหารสัสดี", "phone": "-"}
                             ]
-                        },
-                        {"id": "r3_kp3", "name": "นายทหารกำลังพล 3", "title": "นายทหารกำลังพล", "phone": "-"},
-                        {"id": "r3_kp4", "name": "นายทหารกำลังพล 4", "title": "นายทหารกำลังพล", "phone": "-"},
-                        {"id": "r3_ss1", "name": "นายทหารสัสดี 1", "title": "นายทหารสัสดี", "phone": "-"},
-                        {"id": "r3_ss2", "name": "นายทหารสัสดี 2", "title": "นายทหารสัสดี", "phone": "-"}
+                        }
                     ]
                 }
             ]
         };
 
         function renderChart() {
-            const savedData = localStorage.getItem("fixed_pyramid_chart");
+            const savedData = localStorage.getItem("tree_pyramid_chart");
             currentChartData = savedData ? JSON.parse(savedData) : initialData;
 
             $('#chart-container').html('');
@@ -366,8 +375,8 @@
             if(localStorage.getItem("admin_logged_in") === "true") activateAdmin();
         }
 
-        // ระบบคลิกโหนดปกติ (ไม่ทำงานเมื่อกดโดนตัวเชื่อมล่องหน)
-        $(document).on('click', '.node:not(.invisible-connector)', function(e){
+        // ระบบคลิกโหนดปกติ (ไม่ทำงานเมื่อกดโดนแกนลำต้นล่องหน)
+        $(document).on('click', '.node:not(.tree-trunk)', function(e){
             e.stopPropagation();
             const data = $(this).data('nodeData');
             selectedNodeId = data.id;
@@ -411,12 +420,13 @@
             $('#adminBtn').hide();
         }
 
+        // ระบบออกจากระบบแอดมินล้างหน่วยความจำแคชชั่วคราว
         $('#logoutBtn').click(function() {
             localStorage.setItem("admin_logged_in", "false");
             location.reload();
         });
 
-        // อัปเดตข้อมูลย้อนกลับไปที่หน่วยความจำ JSON
+        // ค้นหาและแก้ไขอัปเดตลงโครงสร้าง JSON
         function findAndUpdate(data, id, n, t, ph, pic) {
             if(data.id === id) {
                 data.name = n; data.title = t; data.phone = ph; data.photo = pic;
@@ -430,9 +440,10 @@
             return false;
         }
 
+        // กดบันทึกข้อมูลถาวรไว้ที่เครื่องคอมพิวเตอร์
         $('#saveChangeBtn').click(function() {
             findAndUpdate(currentChartData, selectedNodeId, $('#inputName').val(), $('#inputPosition').val(), $('#inputPhone').val(), $('#inputPhoto').val());
-            localStorage.setItem("fixed_pyramid_chart", JSON.stringify(currentChartData));
+            localStorage.setItem("tree_pyramid_chart", JSON.stringify(currentChartData));
             alert("บันทึกข้อมูลเรียบร้อยแล้ว");
             location.reload();
         });
