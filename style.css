@@ -1,69 +1,281 @@
-body{
-    font-family: sans-serif;
-    background:#f4f6f9;
-    padding:20px;
+:root {
+    --bg-color: #f4f5f6;      /* สีพื้นหลังเทาอ่อนมินิมอล */
+    --card-bg: #ffffff;       /* สีพื้นหลังการ์ดขาวสะอาด */
+    --text-main: #2b2d42;     /* สีฟอนต์เทาเข้มชาร์โคล */
+    --text-sub: #8d99ae;      /* สีฟอนต์เทาซอฟต์สำหรับตำแหน่ง */
+    --line-color: #3b82f6;    /* สีเส้นเชื่อมโยง (น้ำเงินกองทัพตามแบบบอร์ดจริง) */
+    --modal-blur: rgba(244, 245, 246, 0.85);
 }
 
-#chart-container{
-    overflow:auto;
-    height:85vh;
+body {
+    font-family: 'Anuphan', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-y: hidden; /* ล็อกให้อยู่ในหน้าจอเดียว ไม่ต้องเลื่อนขึ้นลง */
+    box-sizing: border-box;
 }
 
-.modal{
-    display:none;
-    position:fixed;
-    z-index:999;
-    left:0;
-    top:0;
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,.5);
+header {
+    padding: 25px 0 10px 0;
+    text-align: center;
 }
 
-.modal-content{
-    background:white;
-    width:350px;
-    margin:5% auto;
-    padding:20px;
-    border-radius:10px;
-    text-align:center;
+h1 {
+    font-weight: 500;
+    letter-spacing: 1px;
+    margin: 0;
+    font-size: 22px;
 }
 
-#personPhoto{
-    width:150px;
-    height:150px;
-    border-radius:50%;
-    object-fit:cover;
+/* Container ปรับความสูงและสร้างแกนลำต้นคริสต์มาส */
+#chart-pyramid {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 80vh; 
+    position: relative;
+    max-width: 1300px;
+    margin: 0 auto;
+    width: 100%;
+    padding-bottom: 20px;
 }
 
-.close{
-    float:right;
-    cursor:pointer;
-    font-size:25px;
+/* เส้นแกนกลางแนวตั้งดิ่งจากบนลงล่างทิ้งตรงเป๊ะ */
+#chart-pyramid::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 100%;
+    background-color: var(--line-color);
+    z-index: 1;
 }
 
-#adminBtn{
-    position:fixed;
-    right:20px;
-    bottom:20px;
-
-    width:60px;
-    height:60px;
-
-    border:none;
-    border-radius:50%;
-
-    font-size:30px;
-    cursor:pointer;
-
-    background:#1f2937;
-    color:white;
-
-    box-shadow:0 4px 10px rgba(0,0,0,.3);
-
-    z-index:9999;
+/* จัดแถวแต่ละชั้นความสูง */
+.layer-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    width: 100%;
 }
 
-#adminBtn:hover{
-    transform:scale(1.1);
+/* เส้นแนวนอนเชื่อมโยงประจำแต่ละชั้น */
+.layer-row::after {
+    content: '';
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    height: 2px;
+    background-color: var(--line-color);
+    z-index: -1;
 }
+
+/* ชั้นบนสุด และชั้นรอง ไม่ต้องกางเส้นแนวนอนยาว */
+.layer-row[data-layer="1"]::after,
+.layer-row[data-layer="2"]::after {
+    display: none;
+}
+
+.cards-container {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+}
+
+/* การ์ดบุคคลมินิมอลเว้นระยะพอดีหน้าจอ */
+.node-card {
+    background: var(--card-bg);
+    border: 1px solid #e6e8ea;
+    border-radius: 8px;
+    width: 140px;
+    padding: 8px 6px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.015);
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.node-card:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.04);
+    border-color: #cbd5e1;
+}
+
+.node-card img {
+    width: 50px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+    background: #f4f5f6;
+    margin-bottom: 4px;
+}
+
+.node-card .name {
+    font-size: 11.5px;
+    font-weight: 500;
+    margin: 2px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.node-card .title {
+    font-size: 9.5px;
+    color: var(--text-sub);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* การ์ดตำแหน่งว่าง */
+.node-card.vacant {
+    background: #fbfbfc;
+    border: 1px dashed #cbd5e1;
+    opacity: 0.65;
+}
+
+/* แถบเครื่องมือจัดการแอดมินมุมขวาบน */
+#adminTools {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    display: none;
+    gap: 12px;
+    align-items: center;
+    z-index: 1000;
+}
+
+#adminStatus {
+    background: #2b2d42;
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+#logoutBtn {
+    background: #ffffff;
+    color: #2b2d42;
+    border: 1px solid #e6e8ea;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+}
+#logoutBtn:hover { background: #f4f5f6; }
+
+#adminBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #2b2d42;
+    color: white;
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    z-index: 999;
+}
+
+/* Modal ซูมการ์ดบุคคลกึ่งกลางหน้าจอ */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--modal-blur);
+    backdrop-filter: blur(10px);
+}
+
+@keyframes minimalistZoom {
+    from { opacity: 0; transform: translate(-50%, -47%) scale(0.92); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.modal-content {
+    background: #ffffff;
+    width: 340px;
+    padding: 35px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.06);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: minimalistZoom 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    border: 1px solid #f0f2f4;
+}
+
+#personPhoto {
+    width: 100px;
+    height: 120px;
+    object-fit: cover;
+    margin-bottom: 18px;
+    background: #f4f5f6;
+    border: 1px solid #e6e8ea;
+    border-radius: 6px;
+}
+
+#personName { font-size: 19px; font-weight: 500; margin: 0; color: var(--text-main); }
+#personPosition { color: var(--text-sub); font-size: 13.5px; margin: 4px 0 20px 0; }
+
+.phone-container { 
+    font-size: 13.5px; 
+    color: var(--text-main); 
+    background: #f8f9fa; 
+    padding: 10px 0; 
+    border-radius: 8px;
+    border: 1px solid #f0f2f4;
+}
+
+.close { position: absolute; right: 22px; top: 18px; cursor: pointer; font-size: 22px; color: #adb5bd; }
+.close:hover { color: var(--text-main); }
+
+/* ฟอร์มแก้ไขแอดมิน */
+.edit-form { display: none; margin-top: 25px; text-align: left; border-top: 1px solid #f0f2f4; padding-top: 20px; }
+.edit-form label { font-size: 11px; font-weight: 500; text-transform: uppercase; color: #94a3b8; display: block; margin-bottom: 5px; }
+.edit-form input {
+    width: 100%;
+    padding: 9px 12px;
+    margin-bottom: 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 13px;
+    box-sizing: border-box;
+    color: var(--text-main);
+    background-color: #fbfbfc;
+}
+
+.save-btn {
+    width: 100%;
+    background: #2b2d42;
+    color: white;
+    border: none;
+    padding: 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 500;
+    font-size: 14px;
+}
+.save-btn:hover { background: #1d1e2c; }
