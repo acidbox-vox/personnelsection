@@ -3,52 +3,52 @@ let isAdmin = false;
 let selectedNodeId = null;
 let rawChartData = null;
 
-// ฟังก์ชันแปลงข้อมูลแบบเดิม (Tree Structure) ให้กลายเป็นแบบชั้นแถว (Layers) เพื่อนำไปจัดทรงสามเหลี่ยมคริสต์มาสอัตโนมัติ
-function transformTreeToLayers(treeData) {
+// ฟังก์ชันจำลองและแปลงข้อมูลเริ่มต้นตามโครงสร้างบอร์ดของแผนกคุณ
+function generateDefaultLayers(treeData) {
     const layers = {};
     
-    // ชั้น 1: หัวหน้า (ยอดบนสุด - ดึงจากไฟล์ data.json โดยตรง)
-    layers[1] = [ { id: treeData.id, name: treeData.name, title: treeData.title, phone: treeData.phone || '-', photo: treeData.photo || '' } ];
+    // ชั้น 1: หัวหน้า (ดึงจากไฟล์ data.json)
+    layers[1] = [ { id: "l1_head", name: treeData.name || "หัวหน้าแผนก", title: treeData.title || "หัวหน้าแผนก", phone: treeData.phone || '-', photo: treeData.photo || '' } ];
     
     // ชั้น 2: รองหัวหน้า (1 คนถ้วน)
-    layers[2] = [ { id: "r2_deputy_single", name: "รองหัวหน้า", title: "รองหัวหน้า", phone: "-", photo: "" } ];
+    layers[2] = [ { id: "l2_deputy", name: "รองหัวหน้า", title: "รองหัวหน้า", phone: "-", photo: "" } ];
 
     // ชั้น 3: นายทหาร (มี 6 คน)
     layers[3] = [
-        { id: "r3_1", name: "น.ต.อาทิตย์", title: "น.ทสส.บก.บน.2", phone: "-" },
-        { id: "r3_2", name: "ร.อ.หญิง วิภาดา", title: "น.กำลังพล บก.บน.2", phone: "-" },
-        { id: "r3_3", name: "ร.ท.หญิง อารียา", title: "สัสดี บก.บน.2", phone: "-" },
-        { id: "r3_4", name: "ร.ต.ศักดิ์รินทร์", title: "น.กำลังพล", phone: "-" },
-        { id: "r3_5", name: "ว่าง", title: "น.กำลังพล บก.บน.2", phone: "-" },
-        { id: "r3_6", name: "ว่าง", title: "น.สัสดี บก.บน.2", phone: "-" }
+        { id: "l3_p1", name: "น.ต.อาทิตย์", title: "น.ทสส.บก.บน.2", phone: "-", photo: "" },
+        { id: "l3_p2", name: "ร.อ.หญิง วิภาดา", title: "น.กำลังพล บก.บน.2", phone: "-", photo: "" },
+        { id: "l3_p3", name: "ร.ท.หญิง อารียา", title: "สัสดี บก.บน.2", phone: "-", photo: "" },
+        { id: "l3_p4", name: "ร.ต.ศักดิ์รินทร์", title: "น.กำลังพล", phone: "-", photo: "" },
+        { id: "l3_p5", name: "ว่าง", title: "น.กำลังพล บก.บน.2", phone: "-", photo: "" },
+        { id: "l3_p6", name: "ว่าง", title: "น.สัสดี บก.บน.2", phone: "-", photo: "" }
     ];
 
     // ชั้น 4: เจ้าหน้าที่ระดับกลาง (มี 5 คน)
     layers[4] = [
-        { id: "r4_1", name: "พ.อ.อ.วรนิตย์", title: "จนท.กำลังพล", phone: "-" },
-        { id: "r4_2", name: "พ.อ.อ.หญิง พรพิมล", title: "จนท.สัสดี", phone: "-" },
-        { id: "r4_3", name: "พ.อ.ต.ปรัชญา", title: "จนท.กำลังพล", phone: "-" },
-        { id: "r4_4", name: "ว่าง", title: "จนท.กำลังพล", phone: "-" },
-        { id: "r4_5", name: "ว่าง", title: "จนท.กำลังพล", phone: "-" }
+        { id: "l4_p1", name: "พ.อ.อ.วรนิตย์", title: "จนท.กำลังพล", phone: "-", photo: "" },
+        { id: "l4_p2", name: "พ.อ.อ.หญิง พรพิมล", title: "จนท.สัสดี", phone: "-", photo: "" },
+        { id: "l4_p3", name: "พ.อ.ต.ปรัชญา", title: "จนท.กำลังพล", phone: "-", photo: "" },
+        { id: "l4_p4", name: "ว่าง", title: "จนท.กำลังพล", phone: "-", photo: "" },
+        { id: "l4_p5", name: "ว่าง", title: "จนท.กำลังพล", phone: "-", photo: "" }
     ];
 
     // ชั้น 5: เจ้าหน้าที่ระดับล่าง (มี 6 คน)
     layers[5] = [
-        { id: "r5_1", name: "จ.อ.อภิสิทธิ์", title: "จนท.กำลังพล", phone: "-" },
-        { id: "r5_2", name: "ว่าง", title: "จนท.กำลังพล", phone: "-" },
-        { id: "r5_3", name: "ว่าง", title: "จนท.กำลังพล", phone: "-" },
-        { id: "r5_4", name: "ว่าง", title: "จนท.กำลังพล", phone: "-" },
-        { id: "r5_5", name: "ว่าง", title: "จนท.กำลังพล", phone: "-" },
-        { id: "r5_6", name: "ว่าง", title: "จนท.สัสดี", phone: "-" }
+        { id: "l5_p1", name: "จ.อ.อภิสิทธิ์", title: "จนท.กำลังพล", phone: "-", photo: "" },
+        { id: "l5_p2", name: "ว่าง", title: "จนท.กำลังพล", phone: "-", photo: "" },
+        { id: "l5_p3", name: "ว่าง", title: "จนท.กำลังพล", phone: "-", photo: "" },
+        { id: "l5_p4", name: "ว่าง", title: "จนท.กำลังพล", phone: "-", photo: "" },
+        { id: "l5_p5", name: "ว่าง", title: "จนท.กำลังพล", phone: "-", photo: "" },
+        { id: "l5_p6", name: "ว่าง", title: "จนท.สัสดี", phone: "-", photo: "" }
     ];
 
     // ชั้น 6: พนักงานราชการ (ฐานล่างสุดมี 5 คน)
     layers[6] = [
-        { id: "r6_1", name: "นางนิตยา", title: "พนักงานธุรการ", phone: "-" },
-        { id: "r6_2", name: "น.ส.ศศิ", title: "พนักงานธุรการ", phone: "-" },
-        { id: "r6_3", name: "นายระเบียบ", title: "พนักงานธุรการ", phone: "-" },
-        { id: "r6_4", name: "น.ส.นิภาพร", title: "พนักงานธุรการ", phone: "-" },
-        { id: "r6_5", name: "น.ส.หญิงชัญญา", title: "พนักงานธุรการ", phone: "-" }
+        { id: "l6_p1", name: "นางนิตยา", title: "พนักงานธุรการ", phone: "-", photo: "" },
+        { id: "l6_p2", name: "น.ส.ศศิ", title: "พนักงานธุรการ", phone: "-", photo: "" },
+        { id: "l6_p3", name: "นายระเบียบ", title: "พนักงานธุรการ", phone: "-", photo: "" },
+        { id: "l6_p4", name: "น.ส.นิภาพร", title: "พนักงานธุรการ", phone: "-", photo: "" },
+        { id: "l6_p5", name: "น.ส.หญิงชัญญา", title: "พนักงานธุรการ", phone: "-", photo: "" }
     ];
 
     return Object.keys(layers).map(l => ({ layer: parseInt(l), people: layers[l] }));
@@ -57,27 +57,24 @@ function transformTreeToLayers(treeData) {
 function renderPyramidChart() {
     const savedData = localStorage.getItem("pyramid_chart_data");
     
+    // หากเคยเซฟข้อมูลไว้ในเครื่องแล้ว ให้ดึงข้อมูลชุดนั้นขึ้นมาแสดงทันที
     if(savedData) {
         rawChartData = JSON.parse(savedData);
-        // บังคับชั้นที่ 2 ให้เป็นรองหัวหน้าคนเดียวเพื่อความสม่ำเสมอ
-        for (let layer of rawChartData) {
-            if(layer.layer === 2) {
-                if(layer.people.length !== 1) {
-                    layer.people = [ { id: "r2_deputy_single", name: "รองหัวหน้า", title: "รองหัวหน้า", phone: "-", photo: "" } ];
-                }
-            }
-        }
         buildHtmlDOM(rawChartData);
     } else {
+        // หากเป็นการเปิดครั้งแรก ให้ไปดึงชื่อหัวหน้าจาก data.json มารวมกับแผนผังใหม่
         fetch("data.json")
         .then(res => res.json())
         .then(data => {
-            rawChartData = transformTreeToLayers(data);
+            rawChartData = generateDefaultLayers(data);
             localStorage.setItem("pyramid_chart_data", JSON.stringify(rawChartData));
             buildHtmlDOM(rawChartData);
         })
         .catch(err => {
-            console.error("Error loading data.json:", err);
+            // กรณีไม่มีไฟล์ data.json หรือดึงค่าไม่สำเร็จ
+            rawChartData = generateDefaultLayers({});
+            localStorage.setItem("pyramid_chart_data", JSON.stringify(rawChartData));
+            buildHtmlDOM(rawChartData);
         });
     }
 }
@@ -99,19 +96,17 @@ function buildHtmlDOM(layers) {
             const card = document.createElement("div");
             card.className = `node-card ${person.name === 'ว่าง' ? 'vacant' : ''}`;
             
-            // ตรวจสอบความถูกต้องของลิงก์รูปภาพ
             const imgUrl = (person.photo && person.photo.trim() !== "") ? person.photo : defaultImg;
             
-            // ใช้ onerror ในแท็ก img เพื่อป้องกันกรณีที่พาธไฟล์ในดาต้าเบสเสีย/ไม่เจอบนเซิร์ฟเวอร์
             card.innerHTML = `
                 <img src="${imgUrl}" onerror="this.onerror=null; this.src='${defaultImg}';" alt="profile">
                 <div class="name">${person.name}</div>
                 <div class="title">${person.title}</div>
             `;
             
-            // คลิกเปิดการ์ดแสดงผล/แก้ไขดีเทลแบบซูมเข้ากึ่งกลาง
+            // คลิกเปิดดีเทลหรือฟอร์มแอดมินสำหรับแก้ไขข้อมูล
             card.onclick = () => {
-                selectedNodeId = person.id;
+                selectedNodeId = person.id; // ผูก ID การ์ดที่ถูกเลือกอย่างแม่นยำ
                 document.getElementById("personName").innerText = person.name;
                 document.getElementById("personPosition").innerText = person.title;
                 document.getElementById("personPhone").innerText = person.phone || '-';
@@ -143,7 +138,7 @@ function buildHtmlDOM(layers) {
     if(localStorage.getItem("admin_logged_in") === "true") activateAdmin();
 }
 
-// ควบคุมการปิดหน้าต่างดีเทล
+// ควบคุมการปิดหน้าต่างป๊อปอัป
 document.querySelector(".close").onclick = () => {
     document.getElementById("detailModal").style.display = "none";
 };
@@ -153,7 +148,7 @@ window.onclick = (e) => {
     }
 };
 
-// ปุ่มระบบแอดมินและการบันทึกข้อมูลย้อนกลับ
+// ปุ่มระบบรหัสแอดมินเข้าสู่โหมดแก้ไข
 document.getElementById("adminBtn").addEventListener("click", () => {
     const pass = prompt("กรุณากรอกรหัสผ่านแอดมินเพื่อเปิดระบบแก้ไข:");
     if (pass === ADMIN_PASSWORD) {
@@ -173,14 +168,14 @@ function activateAdmin() {
 
 document.getElementById("logoutBtn").onclick = () => {
     localStorage.setItem("admin_logged_in", "false");
-    localStorage.removeItem("pyramid_chart_data"); // ล้างแคชเพื่ออัปเดตโครงสร้างใหม่ทั้งหมด
     location.reload();
 };
 
-// บันทึกข้อมูลและอัปเดตถาวรลงหน่วยความจำเบราว์เซอร์
+// แก้ไขจุดบกพร่อง: ค้นหาและบันทึกข้อมูลกลับลง LocalStorage ตาม ID ที่ระบุไว้จริง
 document.getElementById("saveChangeBtn").onclick = () => {
     if(!rawChartData) return;
     
+    let isFoundAndUpdated = false;
     for (let layer of rawChartData) {
         let p = layer.people.find(person => person.id === selectedNodeId);
         if(p) {
@@ -188,13 +183,18 @@ document.getElementById("saveChangeBtn").onclick = () => {
             p.title = document.getElementById("inputPosition").value;
             p.phone = document.getElementById("inputPhone").value;
             p.photo = document.getElementById("inputPhoto").value;
+            isFoundAndUpdated = true;
             break;
         }
     }
     
-    localStorage.setItem("pyramid_chart_data", JSON.stringify(rawChartData));
-    alert("บันทึกข้อมูลเรียบร้อยแล้ว");
-    location.reload();
+    if(isFoundAndUpdated) {
+        localStorage.setItem("pyramid_chart_data", JSON.stringify(rawChartData));
+        alert("บันทึกข้อมูลและชื่อเรียบร้อยแล้วครับ");
+        location.reload();
+    } else {
+        alert("เกิดข้อผิดพลาด: ไม่พบ ID บุคคลที่ต้องการแก้ไข");
+    }
 };
 
 document.addEventListener("DOMContentLoaded", renderPyramidChart);
