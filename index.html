@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>ผังองค์กร</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/orgchart/3.8.0/css/jquery.orgchart.min.css">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>ผังองค์กรกำลังพล</h1>
+
+<div id="chart-container"></div>
+
+<div id="detailModal" class="modal">
+    <div class="modal-content">
+
+        <span class="close">&times;</span>
+
+        <img id="personPhoto">
+
+        <h2 id="personName"></h2>
+
+        <p id="personPosition"></p>
+
+        <p id="personPhone"></p>
+
+        <p id="personEmail"></p>
+
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/orgchart/3.8.0/js/jquery.orgchart.min.js"></script>
+
+<script src="script.js"></script>
+
+</body>
+
+<button id="adminBtn">⚙️</button>
+</html>

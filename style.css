@@ -1,0 +1,69 @@
+body{
+    font-family: sans-serif;
+    background:#f4f6f9;
+    padding:20px;
+}
+
+#chart-container{
+    overflow:auto;
+    height:85vh;
+}
+
+.modal{
+    display:none;
+    position:fixed;
+    z-index:999;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,.5);
+}
+
+.modal-content{
+    background:white;
+    width:350px;
+    margin:5% auto;
+    padding:20px;
+    border-radius:10px;
+    text-align:center;
+}
+
+#personPhoto{
+    width:150px;
+    height:150px;
+    border-radius:50%;
+    object-fit:cover;
+}
+
+.close{
+    float:right;
+    cursor:pointer;
+    font-size:25px;
+}
+
+#adminBtn{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+
+    width:60px;
+    height:60px;
+
+    border:none;
+    border-radius:50%;
+
+    font-size:30px;
+    cursor:pointer;
+
+    background:#1f2937;
+    color:white;
+
+    box-shadow:0 4px 10px rgba(0,0,0,.3);
+
+    z-index:9999;
+}
+
+#adminBtn:hover{
+    transform:scale(1.1);
+}
