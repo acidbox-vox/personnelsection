@@ -10,7 +10,7 @@ function transformTreeToLayers(treeData) {
     // ชั้น 1: หัวหน้า (ยอดบนสุด)
     layers[1] = [ { id: treeData.id, name: treeData.name, title: treeData.title, phone: treeData.phone || '-', photo: treeData.photo || '' } ];
     
-    // ชั้น 2: รองหัวหน้า (ปรับเหลือ 1 คนถ้วนตามแจ้ง)
+    // ชั้น 2: รองหัวหน้า (ปรับเหลือ 1 คนถ้วนตามกระดานจริง)
     layers[2] = [ { id: "r2_deputy_single", name: "รองหัวหน้า", title: "รองหัวหน้า", phone: "-", photo: "" } ];
 
     // ชั้น 3: นายทหาร (มี 6 คน)
@@ -59,6 +59,12 @@ function renderPyramidChart() {
     
     if(savedData) {
         rawChartData = JSON.parse(savedData);
+        // ตรวจสอบและบังคับลบตัวแปรซ้ำซ้อนใน LocalStorage (หากเคยมีระบบจำค่าเก่า)
+        for (let layer of rawChartData) {
+            if(layer.layer === 2) {
+                layer.people = [ { id: "r2_deputy_single", name: "รองหัวหน้า", title: "รองหัวหน้า", phone: "-", photo: "" } ];
+            }
+        }
         buildHtmlDOM(rawChartData);
     } else {
         fetch("data.json")
@@ -156,6 +162,7 @@ function activateAdmin() {
 
 document.getElementById("logoutBtn").onclick = () => {
     localStorage.setItem("admin_logged_in", "false");
+    localStorage.removeItem("pyramid_chart_data"); // ล้างแคชเพื่ออัปเดตโครงสร้างใหม่
     location.reload();
 };
 
