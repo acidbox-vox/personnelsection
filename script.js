@@ -4,7 +4,7 @@ let selectedNodeId = null;
 let rawChartData = null;
 
 // ปรับค่า URL ของ API หลังบ้าน (ถ้าเอาขึ้น Server จริงให้เปลี่ยน localhost เป็น IP หรือโดเมนของเซิร์ฟเวอร์)
-const BACKEND_API_URL = "http://localhost:3000/api/chart-data";
+const BACKEND_API_URL = "http://10.237.129.212:3000/api/chart-data";
 
 function renderPyramidChart() {
     // ดึงข้อมูลล่าสุดจากเซิร์ฟเวอร์หลักเสมอ เพื่อให้ทุกคนเห็นข้อมูลตรงกัน
