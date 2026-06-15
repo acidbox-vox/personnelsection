@@ -13,7 +13,7 @@
     
     <style>
         :root {
-            --bg-color: #f4f5f6;      /* สีพื้นหลังเทาอ่อนมินิมอล */
+            --bg-color: #f4f5f6;      /* สีพื้นหลังเทาอ่อน */
             --card-bg: #ffffff;       /* สีพื้นหลังการ์ดขาวสะอาด */
             --text-main: #2b2d42;     /* สีฟอนต์เทาเข้มชาร์โคล */
             --text-sub: #8d99ae;      /* สีฟอนต์เทาซอฟต์สำหรับตำแหน่ง */
@@ -83,8 +83,8 @@
             border-color: #d1d5db !important;
         }
 
-        /* เทคนิคซ่อนกล่องแกนกลาง (ลำต้นต้นคริสต์มาส) เพื่อความสมบูรณ์แบบของทรงปิรามิด */
-        .orgchart .node.tree-trunk {
+        /* เทคนิคซ่อนโหนดเชื่อมต่อแกนกลาง (ทำให้ผังทิ้งดิ่งตรงกลางสมมาตรทรงต้นคริสต์มาส) */
+        .orgchart .node.center-trunk {
             visibility: hidden !important;
             opacity: 0 !important;
             height: 0px !important;
@@ -295,7 +295,7 @@
         let selectedNodeId = null;
         let currentChartData = null;
 
-        // โครงสร้างแบบแกนกลางต้นคริสต์มาส (Center Trunk) มุ่งตรงลงมาและแตกกิ่งสมดุลซ้ายขวาอย่างเท่าเทียม
+        // โครงสร้างปิรามิดสมมาตรทรงต้นคริสต์มาส โดยใช้เทคนิค Center Trunk บังคับทิศทางตรงกึ่งกลาง
         const initialData = {
             "id": "r1_head", "name": "หัวหน้า", "title": "หัวหน้า", "phone": "-", "photo": "",
             "children": [
@@ -304,16 +304,16 @@
                     "children": [
                         // แกนลำต้นชั้นที่ 1 (ซ่อนอยู่ตรงกึ่งกลางของแถวที่ 3)
                         {
-                            "id": "trunk_layer3", "className": "tree-trunk", "name": "trunk", "title": "trunk",
+                            "id": "trunk_layer3", "className": "center-trunk", "name": "trunk", "title": "trunk",
                             "children": [
-                                // แถวที่ 3: กระจายตัวออกซ้าย-ขวาเท่าๆ กัน (ฝั่งละ 3 คน รวมเป็น 6 คน)
+                                // แถวที่ 3: กระจายตัวออกซ้าย-ขวาเท่าๆ กัน (รวม 6 คนในหน้ากระดานเดียวกัน)
                                 {"id": "r3_kp1", "name": "นายทหารกำลังพล 1", "title": "นายทหารกำลังพล", "phone": "-"},
                                 {"id": "r3_kp2", "name": "นายทหารกำลังพล 2", "title": "นายทหารกำลังพล", "phone": "-"},
                                 {"id": "r3_kp3", "name": "นายทหารกำลังพล 3", "title": "นายทหารกำลังพล", "phone": "-"},
                                 
-                                // แกนลำต้นชั้นที่ 2 (ทิ้งดิ่งลงมาจากแกนกลางแถวที่ 3 สู่แถวที่ 4)
+                                // แกนลำต้นชั้นที่ 2 (ทิ้งดิ่งลงมาจากกึ่งกลางแถวที่ 3 สู่แถวที่ 4)
                                 {
-                                    "id": "trunk_layer4", "className": "tree-trunk", "name": "trunk", "title": "trunk",
+                                    "id": "trunk_layer4", "className": "center-trunk", "name": "trunk", "title": "trunk",
                                     "children": [
                                         // แถวที่ 4: จนท.กำลังพล 5 นาย (จัดสมดุลซ้าย-ขวาล้อมรอบแกนกลาง)
                                         {"id": "r4_kp1", "name": "จนท.กำลังพล 1", "title": "จนท.กำลังพล", "phone": "-"},
@@ -321,7 +321,7 @@
                                         
                                         // แกนลำต้นชั้นที่ 3 (ทิ้งดิ่งจากกึ่งกลางแถวที่ 4 สู่แถวที่ 5)
                                         {
-                                            "id": "trunk_layer5", "className": "tree-trunk", "name": "trunk", "title": "trunk",
+                                            "id": "trunk_layer5", "className": "center-trunk", "name": "trunk", "title": "trunk",
                                             "children": [
                                                 // แถวที่ 5: จนท.กำลังพลน้อย 5 นาย + จนท.สัสดี 1 นาย (ฝั่งละ 3 คน รวมเป็น 6 คน)
                                                 {"id": "r5_kpn1", "name": "จนท.กำลังพลน้อย 1", "title": "จนท.กำลังพลน้อย", "phone": "-"},
@@ -330,7 +330,7 @@
                                                 
                                                 // แกนลำต้นชั้นที่ 4 (ทิ้งดิ่งจากกึ่งกลางแถวที่ 5 สู่แถวที่ 6 ล่างสุด)
                                                 {
-                                                    "id": "trunk_layer6", "className": "tree-trunk", "name": "trunk", "title": "trunk",
+                                                    "id": "trunk_layer6", "className": "center-trunk", "name": "trunk", "title": "trunk",
                                                     "children": [
                                                         // แถวที่ 6: พนักงานราชการ 5 นาย (ฐานล่างสุดของต้นคริสต์มาส)
                                                         {"id": "r6_pw1", "name": "พนักงานราชการ 1", "title": "พนักงานราชการ", "phone": "-"},
@@ -361,7 +361,7 @@
         };
 
         function renderChart() {
-            const savedData = localStorage.getItem("tree_pyramid_chart");
+            const savedData = localStorage.getItem("christmas_tree_chart");
             currentChartData = savedData ? JSON.parse(savedData) : initialData;
 
             $('#chart-container').html('');
@@ -375,8 +375,8 @@
             if(localStorage.getItem("admin_logged_in") === "true") activateAdmin();
         }
 
-        // ระบบคลิกโหนดปกติ (ไม่ทำงานเมื่อกดโดนแกนลำต้นล่องหน)
-        $(document).on('click', '.node:not(.tree-trunk)', function(e){
+        // ระบบคลิกโหนดปกติ (ไม่ทำงานเมื่อกดโดนโหนดแกนกลางล่องหน)
+        $(document).on('click', '.node:not(.center-trunk)', function(e){
             e.stopPropagation();
             const data = $(this).data('nodeData');
             selectedNodeId = data.id;
@@ -420,13 +420,13 @@
             $('#adminBtn').hide();
         }
 
-        // ระบบออกจากระบบแอดมินล้างหน่วยความจำแคชชั่วคราว
+        // ระบบออกระบบล้างแคชชั่วคราว
         $('#logoutBtn').click(function() {
             localStorage.setItem("admin_logged_in", "false");
             location.reload();
         });
 
-        // ค้นหาและแก้ไขอัปเดตลงโครงสร้าง JSON
+        // อัปเดตข้อมูลย้อนกลับไปที่หน่วยความจำ JSON
         function findAndUpdate(data, id, n, t, ph, pic) {
             if(data.id === id) {
                 data.name = n; data.title = t; data.phone = ph; data.photo = pic;
@@ -440,10 +440,10 @@
             return false;
         }
 
-        // กดบันทึกข้อมูลถาวรไว้ที่เครื่องคอมพิวเตอร์
+        // กดบันทึกข้อมูลถาวร
         $('#saveChangeBtn').click(function() {
             findAndUpdate(currentChartData, selectedNodeId, $('#inputName').val(), $('#inputPosition').val(), $('#inputPhone').val(), $('#inputPhoto').val());
-            localStorage.setItem("tree_pyramid_chart", JSON.stringify(currentChartData));
+            localStorage.setItem("christmas_tree_chart", JSON.stringify(currentChartData));
             alert("บันทึกข้อมูลเรียบร้อยแล้ว");
             location.reload();
         });
