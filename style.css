@@ -1,37 +1,335 @@
-/* จัดสไตล์กล่อง Description ในป๊อปอัป */
+/* ==========================================
+   1. ตั้งค่าพื้นฐานและการจัดวางหน้าจอหลัก
+   ========================================== */
+body {
+    font-family: 'Sarabun', Arial, sans-serif;
+    background-color: #1a1a1a; /* พื้นหลังสีดำตามธีมเดิมของคุณ */
+    color: #ffffff;            /* ตัวอักษรสีขาว */
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.header-container {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header-container h1 {
+    color: #e53e3e; /* สีแดงโดดเด่นตามธีมของคุณ */
+    margin-bottom: 5px;
+}
+
+.header-container p {
+    color: #a0aec0;
+    margin: 0;
+}
+
+/* ล็อกพื้นที่แสดงผล ไม่ให้ผังแตก */
+.chart-wrapper {
+    width: 100%;
+    max-width: 1200px;
+    overflow-x: auto; /* ถ้านิตยสารหรือหน้าจอแคบ ให้เลื่อนซ้ายขวาได้ */
+    padding: 20px 0;
+    display: flex;
+    justify-content: center;
+}
+
+/* ==========================================
+   2. ส่วนสำคัญ: จัดโครงสร้างให้เป็นทรงปิรามิด
+   ========================================== */
+.pyramid-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* จัดให้ทุกชั้นอยู่ตรงกลางเพื่่อเป็นทรงปิรามิด */
+    gap: 25px;           /* ระยะห่างระหว่างชั้นบน-ล่าง */
+}
+
+.layer-row {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.cards-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap; /* ล็อกไว้ไม่ให้การ์ดในชั้นเดียวกันแตกแถวลงไปข้างล่าง */
+    gap: 15px;         /* ระยะห่างระหว่างการ์ดซ้าย-ขวา */
+}
+
+/* ==========================================
+   3. สไตล์ของการ์ดแต่ละใบ (Node Card)
+   ========================================== */
+.node-card {
+    background-color: #2d2d2d; /* สีดำสว่าง/เทาเข้ม */
+    border: 2px solid #4a5568;
+    border-radius: 8px;
+    width: 140px;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+/* พอยเตอร์ชี้แล้วให้การ์ดเด่นขึ้นมา และเปลี่ยนเป็นขอบสีแดง */
+.node-card:hover {
+    transform: translateY(-5px);
+    border-color: #e53e3e;
+    box-shadow: 0 6px 12px rgba(229, 62, 62, 0.4);
+}
+
+/* สไตล์กรณีตำแหน่งนั้น "ว่าง" */
+.node-card.vacant {
+    border-style: dashed;
+    background-color: #222222;
+    opacity: 0.7;
+}
+
+.node-card img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e53e3e; /* ขอบรูปสีแดง */
+    background-color: #ffffff;
+    margin-bottom: 8px;
+}
+
+.node-card .name {
+    font-weight: bold;
+    font-size: 14px;
+    color: #ffffff;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* ถ้าชื่อยาวเกินให้ขึ้น ... */
+}
+
+.node-card .title {
+    font-size: 11px;
+    color: #cbd5e1;
+    line-height: 1.3;
+}
+
+/* ==========================================
+   4. หน้าต่างป๊อปอัป (Modal Display)
+   ========================================== */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0,0,0,0.7); /* พื้นหลังมืดมิดลงไป */
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background-color: #ffffff; /* หน้าต่างป๊อปอัปใช้สีขาวเพื่อให้แอดมินอ่านและพิมพ์ง่าย */
+    color: #1a1a1a;
+    margin: 6% auto; 
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 450px;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    max-height: 85vh;
+    overflow-y: auto; /* ถ้าข้อมูลยาวเกินให้เลื่อนแนวตั้งในป๊อปอัปได้ */
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    color: #a0aec0;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #e53e3e;
+}
+
+.modal-avatar-wrapper {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+#personPhoto {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #e53e3e;
+}
+
+.modal-title-text {
+    text-align: center;
+    color: #4a5568;
+    margin-top: -10px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+#personName {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #111827;
+}
+
+/* 🌟 สไตล์กล่อง Description เพิ่มเติมย่อยภายในป๊อปอัป */
 .description-section {
     background-color: #f8fafc;
     border: 1px dashed #cbd5e1;
     border-radius: 8px;
     padding: 12px 14px;
-    margin: 15px 0;
+    margin-bottom: 15px;
     text-align: left;
 }
 
 #personDescription {
-    font-size: 13.5px;
+    font-size: 13px;
     color: #334155;
     margin: 0;
     line-height: 1.5;
-    white-space: pre-line; /* ทำให้เวลาพิมพ์เว้นบรรทัดในหน้าเว็บ แล้วแสดงผลเว้นบรรทัดตามจริง */
+    white-space: pre-line;
 }
 
-/* จัดสไตล์ช่องพิมพ์ของแอดมิน */
-.input-group textarea {
+.phone-container {
+    background-color: #edf2f7;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* ==========================================
+   5. ส่วนฟอร์มแก้ไขของแอดมิน (Admin Form)
+   ========================================== */
+.edit-form {
+    border-top: 2px solid #e2e8f0;
+    padding-top: 15px;
+    margin-top: 15px;
+}
+
+.edit-form h3 {
+    margin-top: 0;
+    font-size: 15px;
+    color: #e53e3e;
+}
+
+.input-group {
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+.input-group label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #4a5568;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.input-group input, .input-group textarea {
     width: 100%;
-    padding: 10px 12px;
+    padding: 8px 12px;
     border: 1px solid #cbd5e1;
     border-radius: 6px;
     font-family: inherit;
-    font-size: 13.5px;
+    font-size: 13px;
     box-sizing: border-box;
     color: #1e293b;
     background-color: #f8fafc;
-    resize: vertical; /* ยืดขยายขนาดแนวตั้งได้ตามต้องการ */
 }
 
-.input-group textarea:focus {
+.input-group textarea {
+    resize: vertical;
+}
+
+.input-group input:focus, .input-group textarea:focus {
     outline: none;
     border-color: #3b82f6;
     background-color: #ffffff;
+}
+
+.save-btn {
+    width: 100%;
+    background-color: #e53e3e;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.save-btn:hover {
+    background-color: #c53030;
+}
+
+/* ==========================================
+   6. ปุ่มแอดมินลอย และแถบแจ้งสถานะ
+   ========================================== */
+.admin-floating-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #2d2d2d;
+    color: white;
+    border: 2px solid #e53e3e;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+.admin-tools-panel {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: #2d2d2d;
+    border-left: 4px solid #e53e3e;
+    padding: 10px 15px;
+    border-radius: 0 6px 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    z-index: 999;
+}
+
+.logout-btn {
+    background-color: transparent;
+    border: 1px solid #a0aec0;
+    color: #a0aec0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.logout-btn:hover {
+    color: #e53e3e;
+    border-color: #e53e3e;
 }
