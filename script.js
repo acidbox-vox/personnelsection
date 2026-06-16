@@ -3,7 +3,7 @@ let isAdmin = false;
 let selectedNodeId = null;
 let rawChartData = null;
 
-// ⚠️ แก้ไขจุดนี้จุดเดียว: นำลิงก์ URL เว็บแอปที่ได้จาก Apps Script มาวางแทนที่ตรงนี้ครับ
+// ⚠️ ลิงก์ URL เว็บแอปจาก Apps Script ของคุณ
 const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzL8Vl6GS-vbaQBAR9F636X6Cqh4oHI9_AJzBTkz-b1Ro7ciW0C5WRT3lcR0mQEXj2u/exec";
 
 function renderPyramidChart() {
@@ -51,6 +51,9 @@ function buildHtmlDOM(layers) {
                 document.getElementById("personPosition").innerText = person.title;
                 document.getElementById("personPhone").innerText = person.phone || '-';
                 
+                // ดึงข้อความรายละเอียดเพิ่มเติมมาแสดงผลในป๊อปอัปโหมดคนดูทั่วไป
+                document.getElementById("personDescription").innerText = person.description && person.description.trim() !== "" ? person.description : "ไม่มีรายละเอียดเพิ่มเติม";
+                
                 const modalImg = document.getElementById("personPhoto");
                 modalImg.src = imgUrl;
                 modalImg.onerror = function() { this.src = defaultImg; };
@@ -61,6 +64,8 @@ function buildHtmlDOM(layers) {
                     document.getElementById("inputPosition").value = person.title;
                     document.getElementById("inputPhone").value = person.phone || '';
                     document.getElementById("inputPhoto").value = person.photo || '';
+                    // ยัดค่ารายละเอียดเดิมลงช่องพิมพ์ข้อความของแอดมิน
+                    document.getElementById("inputDescription").value = person.description || '';
                 } else {
                     document.getElementById("adminEditForm").style.display = "none";
                 }
@@ -118,7 +123,8 @@ document.getElementById("saveChangeBtn").onclick = () => {
         name: document.getElementById("inputName").value,
         title: document.getElementById("inputPosition").value,
         phone: document.getElementById("inputPhone").value,
-        photo: document.getElementById("inputPhoto").value
+        photo: document.getElementById("inputPhoto").value,
+        description: document.getElementById("inputDescription").value // ส่งรายละเอียดเพิ่มเติมกลับไปบันทึก
     };
 
     const saveBtn = document.getElementById("saveChangeBtn");
