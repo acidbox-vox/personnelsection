@@ -3,44 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personnel Management System</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>ผังโครงสร้างบุคลากร</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header>
-        <h1>PERSONNEL SYSTEM</h1>
-    </header>
-    
-    <div id="adminTools">
-        <span id="adminStatus">ADMIN MODE</span>
-        <button id="logoutBtn">LOGOUT 🔓</button>
+    <div class="header-container">
+        <h1>ผังโครงสร้างบุคลากร</h1>
+        <p>ระบบจัดการและแสดงรายชื่อข้าราชการและพนักงานราชการออนไลน์</p>
     </div>
 
-    <div id="chart-pyramid"></div>
+    <div class="chart-wrapper">
+        <div id="chart-pyramid" class="pyramid-container">
+            <div style="text-align: center; color: #64748b; padding: 40px;">กำลังโหลดข้อมูลผังบุคลากร...</div>
+        </div>
+    </div>
 
-    <button id="adminBtn">⚙️</button>
+    <div id="adminTools" class="admin-tools-panel" style="display: none;">
+        <span>🔐 อยู่ในโหมดผู้ดูแลระบบ (แก้ไขข้อมูลได้โดยตรง)</span>
+        <button id="logoutBtn" class="logout-btn">ออกจากโหมดแอดมิน</button>
+    </div>
+
+    <button id="adminBtn" class="admin-floating-btn" title="เข้าสู่โหมดแอดมิน">⚙️</button>
 
     <div id="detailModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <img id="personPhoto" src="" alt="Profile">
+            
+            <div class="modal-avatar-wrapper">
+                <img id="personPhoto" src="" alt="รูปโปรไฟล์">
+            </div>
+            
             <h2 id="personName"></h2>
-            <p id="personPosition"></p>
-            <div class="phone-container">📞 เบอร์โทรศัพท์: <span id="personPhone"></span></div>
+            <p id="personPosition" class="modal-title-text"></p>
+            
+            <div class="description-section">
+                <label style="font-size: 11px; color: #94a3b8; font-weight: bold; display: block; margin-bottom: 4px; text-transform: uppercase;">รายละเอียดงาน / หมายเหตุ</label>
+                <p id="personDescription"></p>
+            </div>
+            
+            <div class="phone-container">
+                📞 เบอร์โทรศัพท์ภายใน: <span id="personPhone"></span>
+            </div>
 
-            <div id="adminEditForm" class="edit-form">
-                <label>ชื่อ - นามสกุล</label>
-                <input type="text" id="inputName">
-                <label>ตำแหน่ง</label>
-                <input type="text" id="inputPosition">
-                <label>เบอร์โทรศัพท์</label>
-                <input type="text" id="inputPhone">
-                <label>ลิงก์รูปภาพ (URL)</label>
-                <input type="text" id="inputPhoto">
+            <div id="adminEditForm" class="edit-form" style="display: none;">
+                <h3>✏️ แก้ไขข้อมูลบุคลากรท่านนี้</h3>
+                
+                <div class="input-group">
+                    <label for="inputName">ชื่อ - นามสกุล</label>
+                    <input type="text" id="inputName" placeholder="เช่น ร.อ.หญิง วิภาดา">
+                </div>
+                
+                <div class="input-group">
+                    <label for="inputPosition">ตำแหน่ง / หน้าที่</label>
+                    <input type="text" id="inputPosition" placeholder="เช่น น.กำลังพล บก.บน.2">
+                </div>
+                
+                <div class="input-group">
+                    <label for="inputPhone">เบอร์โทรศัพท์ (พิมพ์ได้ทั้งข้อความและตัวเลข)</label>
+                    <input type="text" id="inputPhone" placeholder="เช่น 5-XXXX หรือ 081-XXXXXXX">
+                </div>
+                
+                <div class="input-group">
+                    <label for="inputPhoto">ลิงก์ URL รูปภาพโปรไฟล์</label>
+                    <input type="text" id="inputPhoto" placeholder="https://example.com/image.jpg">
+                </div>
+                
+                <div class="input-group">
+                    <label for="inputDescription">รายละเอียดเพิ่มเติม / หมายเหตุย่อ</label>
+                    <textarea id="inputDescription" rows="4" placeholder="กรอกข้อมูลประวัติ หน้าที่รับผิดชอบพิเศษ หรือหมายเหตุอื่น ๆ ตรงนี้..."></textarea>
+                </div>
+                
                 <button class="save-btn" id="saveChangeBtn">SAVE CHANGES</button>
             </div>
         </div>
